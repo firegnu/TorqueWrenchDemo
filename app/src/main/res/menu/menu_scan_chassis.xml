@@ -1,0 +1,17 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.firegnu.torquewrenchdemo.ScanChassisActivity">
+    <item android:id="@+id/action_scan_menu"
+        android:icon="@drawable/renwuliebiao2"
+        android:title="@string/action_viewas_list"
+        android:showAsAction="always" />
+    <item android:id="@+id/action_history_menu"
+        android:icon="@drawable/renwutixing2"
+        android:title="@string/action_viewas_list"
+        android:showAsAction="always" />
+    <item android:id="@+id/action_setting_menu"
+        android:icon="@drawable/yonghuxinxi2"
+        android:title="@string/action_viewas_list"
+        android:showAsAction="always" />
+</menu>
