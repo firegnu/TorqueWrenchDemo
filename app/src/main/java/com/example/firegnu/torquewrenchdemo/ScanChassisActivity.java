@@ -10,13 +10,17 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.Spinner;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
@@ -24,6 +28,8 @@ import com.google.zxing.integration.android.IntentResult;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class ScanChassisActivity extends Activity {
@@ -31,6 +37,11 @@ public class ScanChassisActivity extends Activity {
     LinearLayout firstStepLayout;
     LinearLayout sencondStepLayout;
     LinearLayout thirdStepLayout;
+
+    private List<String> listClass = new ArrayList<String>();
+    private Spinner spinnerClass;
+    private ArrayAdapter<String> adapterClass;
+    private String selectedClass = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,37 +80,48 @@ public class ScanChassisActivity extends Activity {
         }
         //
 
-        Button firstStepButton = (Button) findViewById(R.id.firststepbutton);
+        final Button firstStepButton = (Button) findViewById(R.id.firststepbutton);
+        final Button sencondStepButton = (Button) findViewById(R.id.sencondstepbutton);
+        final Button thirdStepButton = (Button) findViewById(R.id.thirdstepbutton);
+        firstStepButton.setTextColor(getResources().getColor(R.color.cardview_initial_background));
         firstStepButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 firstStepLayout.setVisibility(View.VISIBLE);
                 sencondStepLayout.setVisibility(View.GONE);
                 thirdStepLayout.setVisibility(View.GONE);
+                firstStepButton.setTextColor(getResources().getColor(R.color.cardview_initial_background));
+                sencondStepButton.setTextColor(getResources().getColor(R.color.pureblack));
+                thirdStepButton.setTextColor(getResources().getColor(R.color.pureblack));
             }
         });
 
-        Button sencondStepButton = (Button) findViewById(R.id.sencondstepbutton);
         sencondStepButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 sencondStepLayout.setVisibility(View.VISIBLE);
                 firstStepLayout.setVisibility(View.GONE);
                 thirdStepLayout.setVisibility(View.GONE);
+                sencondStepButton.setTextColor(getResources().getColor(R.color.cardview_initial_background));
+                firstStepButton.setTextColor(getResources().getColor(R.color.pureblack));
+                thirdStepButton.setTextColor(getResources().getColor(R.color.pureblack));
             }
         });
 
-        Button thirdStepButton = (Button) findViewById(R.id.thirdstepbutton);
+
         thirdStepButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 thirdStepLayout.setVisibility(View.VISIBLE);
                 firstStepLayout.setVisibility(View.GONE);
                 sencondStepLayout.setVisibility(View.GONE);
+                thirdStepButton.setTextColor(getResources().getColor(R.color.cardview_initial_background));
+                sencondStepButton.setTextColor(getResources().getColor(R.color.pureblack));
+                firstStepButton.setTextColor(getResources().getColor(R.color.pureblack));
             }
         });
 
-        Button firstScanButton = (Button) findViewById(R.id.firstscanbutton);
+        ImageButton firstScanButton = (ImageButton) findViewById(R.id.firstscanbutton);
         firstScanButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -109,7 +131,7 @@ public class ScanChassisActivity extends Activity {
             }
         });
 
-        Button sencondScanButton = (Button) findViewById(R.id.sencondscanbutton);
+        ImageButton sencondScanButton = (ImageButton) findViewById(R.id.sencondscanbutton);
         sencondScanButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -118,6 +140,43 @@ public class ScanChassisActivity extends Activity {
                 startActivityForResult(intent, 0);
             }
         });
+        ////////////////////////
+        listClass.add("M16");
+        listClass.add("M15");
+        listClass.add("M14");
+        listClass.add("M13");
+        listClass.add("M12");
+        spinnerClass = (Spinner)findViewById(R.id.spinnerclass);
+        adapterClass = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, listClass);
+        adapterClass.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerClass.setAdapter(adapterClass);
+
+        spinnerClass.setOnItemSelectedListener(new Spinner.OnItemSelectedListener(){
+            public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+                selectedClass = adapterClass.getItem(arg2);
+                arg0.setVisibility(View.VISIBLE);
+            }
+            public void onNothingSelected(AdapterView<?> arg0) {
+                // TODO Auto-generated method stub
+                selectedClass = "";
+                arg0.setVisibility(View.VISIBLE);
+            }
+        });
+
+        spinnerClass.setOnTouchListener(new Spinner.OnTouchListener(){
+            public boolean onTouch(View v, MotionEvent event) {
+                // TODO Auto-generated method stub
+                return false;
+            }
+        });
+
+        spinnerClass.setOnFocusChangeListener(new Spinner.OnFocusChangeListener(){
+            public void onFocusChange(View v, boolean hasFocus) {
+                // TODO Auto-generated method stub
+
+            }
+        });
+        ////////////////////////
     }
 
     @Override

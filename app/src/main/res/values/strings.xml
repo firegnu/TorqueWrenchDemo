@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">TorqueWrenchDemo</string>
+    <string name="app_name">扭矩检测Demo</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="login_label">扭矩检测终端管理系统</string>
-    <string name="prompt_password">请输入用户密码</string>
+    <string name="prompt_password">请输入登陆密码</string>
     <string name="action_sign_in_short">登 录</string>
     <string name="action_sign_in">登 录 系 统</string>
     <string name="action_login_userselector_label">请选择登陆用户</string>
@@ -12,9 +12,9 @@
     <string name="action_viewas_list">viewasList</string>
     <string name="title_activity_settings">Settings</string>
     <string name="title_activity_scan_history">ScanHistory</string>
-    <string name="header_text1">底盘号</string>
-    <string name="header_text2">检测部位</string>
-    <string name="header_text3">工位号</string>
+    <string name="header_text1">车辆型号</string>
+    <string name="header_text2">零件名称</string>
+    <string name="header_text3">工作编号</string>
     <string name="header_text4">首检扭矩</string>
     <string name="header_text5">时间</string>
     <string name="header_text6">结果</string>

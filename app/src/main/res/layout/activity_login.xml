@@ -1,15 +1,16 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".LoginActivity">
+    android:layout_height="match_parent"
+    tools:context=".LoginActivity"
+    android:background="@color/backgroundcolor">
     <ProgressBar android:id="@+id/login_progress" style="?android:attr/progressBarStyleLarge"
         android:layout_width="wrap_content" android:layout_height="wrap_content"
         android:layout_marginBottom="8dp" android:visibility="gone"
         android:layout_centerInParent="true"/>
     <ScrollView android:id="@+id/login_form" android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin">
 
         <LinearLayout android:id="@+id/email_login_form" android:layout_width="match_parent"
             android:layout_height="wrap_content" android:orientation="vertical"
@@ -19,7 +20,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/action_login_userselector_label"
                 android:layout_gravity="center"
-                android:textSize="24dp"/>
+                android:textSize="18dp"/>
             <LinearLayout android:id="@+id/loginuserselectorlayout" android:layout_width="wrap_content"
                 android:layout_height="wrap_content" android:orientation="horizontal"
                 android:layout_gravity="center"
@@ -30,23 +31,25 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/prepage"
+                android:background="@android:color/transparent"
                 android:layout_gravity="center"
                 android:layout_weight="4"
                 />
-            <ImageView
+            <com.example.firegnu.torquewrenchdemo.RoundedImageView
                 android:id="@+id/userlogo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/userlogo"
                 android:layout_weight="1"
                 android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                />
+                android:layout_marginRight="10dp">
+            </com.example.firegnu.torquewrenchdemo.RoundedImageView>
                 <ImageButton
                     android:id="@+id/nextuserbutton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/nextpage"
+                    android:background="@android:color/transparent"
                     android:layout_gravity="center"
                     android:layout_weight="4"
                     />
@@ -64,13 +67,33 @@
                 android:padding="10dp"
                 android:layout_marginTop="15dp"
                 android:drawableLeft="@drawable/password"
+                android:background="@drawable/textedit_style"
                 />
 
             <Button android:id="@+id/email_sign_in_button" style="?android:textAppearanceSmall"
                 android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:layout_marginTop="16dp" android:text="@string/action_sign_in"
-                android:textColor="#000"
+                android:textColor="#fff"
+                android:background="@drawable/loginbutton_rect_list_normal"
                 />
         </LinearLayout>
     </ScrollView>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/copyrightLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_alignParentBottom="true"
+        android:background="@color/secondary"
+        >
+        <TextView
+            android:id="@+id/copyrighttextview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CopyRight @ 2015陕西杰创科技有限公司"
+            android:layout_gravity="center"
+            android:textSize="18dp"
+
+            android:textColor="@android:color/white"/>
+    </LinearLayout>
 </RelativeLayout>

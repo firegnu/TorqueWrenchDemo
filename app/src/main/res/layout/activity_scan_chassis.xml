@@ -5,8 +5,8 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="com.example.firegnu.torquewrenchdemo.ScanChassisActivity"
-    android:theme="@android:style/Theme.WithActionBar">
-
+    android:background="@color/backgroundcolor"
+    >
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -17,42 +17,85 @@
             android:orientation="horizontal"
             android:layout_marginBottom="10dp"
             >
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
             <Button
                 android:id="@+id/firststepbutton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
                 android:text="扫描底盘VIN码"
-                android:layout_gravity="center">
+                android:layout_gravity="center"
+                android:textColor="#000"
+                android:textSize="16sp"
+                >
             </Button>
+                <View
+                    android:id="@+id/firsttextview"
+                    android:layout_width="fill_parent"
+                    android:layout_height="0.5dp"
+                    android:background="@android:color/black"
+                    android:layout_marginTop="-10dp"/>
+            </LinearLayout>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="---->"
-                android:layout_gravity="center"/>
+                android:layout_gravity="center"
+                android:textColor="#000"/>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
             <Button
                 android:id="@+id/sencondstepbutton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="扫描零件号"
-                android:layout_gravity="center">
+                android:layout_gravity="center"
+                android:textColor="#000"
+                android:background="@android:color/transparent"
+                android:textSize="16sp">
             </Button>
+                <View
+                    android:layout_width="fill_parent"
+                    android:layout_height="0.5dp"
+                    android:background="@android:color/black"
+                    android:layout_marginTop="-10dp"/>
+            </LinearLayout>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="---->"
-                android:layout_gravity="center"/>
+                android:layout_gravity="center"
+                android:textColor="#000"/>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
             <Button
                 android:id="@+id/thirdstepbutton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="检测紧固扭矩"
-                android:layout_gravity="center">
+                android:layout_gravity="center"
+                android:textColor="#000"
+                android:background="@android:color/transparent"
+                android:textSize="16sp">
             </Button>
+                <View
+                    android:layout_width="fill_parent"
+                    android:layout_height="0.5dp"
+                    android:background="@android:color/black"
+                    android:layout_marginTop="-10dp"/>
+            </LinearLayout>
         </LinearLayout>
         <View
             android:layout_width="fill_parent"
             android:layout_height="0.5dp"
-            android:background="@android:color/darker_gray"
+            android:background="@color/text"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="15dp"/>
         <!--first-->
@@ -65,7 +108,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_marginBottom="5dp">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -79,14 +123,18 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_weight="18"/>
-            <Button
+                android:layout_weight="18"
+                android:background="@drawable/textedit_style"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"/>
+            <ImageButton
                 android:id="@+id/firstscanbutton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="扫描"
-                android:layout_gravity="center">
-            </Button>
+                android:layout_gravity="center"
+                android:src="@drawable/ic_action_camera"
+                android:background="@android:color/transparent">
+            </ImageButton>
             </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
@@ -106,12 +154,15 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="32"
+                android:background="@drawable/textedit_style"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
                 />
         </LinearLayout>
         <View
             android:layout_width="fill_parent"
             android:layout_height="0.5dp"
-            android:background="@android:color/darker_gray"
+            android:background="@color/text"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="15dp"/>
         <LinearLayout
@@ -124,7 +175,8 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="10dp">
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -138,6 +190,9 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:layout_weight="32"
+                        android:background="@drawable/textedit_style"
+                        android:paddingTop="5dp"
+                        android:paddingBottom="5dp"
                         />
                 </LinearLayout>
                 <LinearLayout
@@ -157,8 +212,16 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:layout_weight="32"
+                        android:background="@drawable/textedit_style"
+                        android:paddingTop="5dp"
+                        android:paddingBottom="5dp"
                         />
                 </LinearLayout>
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="0.5dp"
+                android:background="@color/text"
+                android:layout_marginTop="10dp"/>
                 <ScrollView android:id="@+id/login_form" android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     >
@@ -184,7 +247,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:layout_marginBottom="10dp">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -198,19 +262,24 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:layout_weight="18"/>
-                <Button
+                    android:layout_weight="18"
+                    android:background="@drawable/textedit_style"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"/>
+                <ImageButton
                     android:id="@+id/sencondscanbutton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="扫描"
-                    android:layout_gravity="center">
-                </Button>
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_action_camera"
+                    android:background="@android:color/transparent">
+                </ImageButton>
             </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:layout_marginBottom="10dp">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -225,12 +294,15 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_weight="32"
+                    android:background="@drawable/textedit_style"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"
                     />
             </LinearLayout>
             <View
                 android:layout_width="fill_parent"
                 android:layout_height="0.5dp"
-                android:background="@android:color/darker_gray"
+                android:background="@color/text"
                 android:layout_marginTop="5dp"
                 android:layout_marginBottom="15dp"/>
             <LinearLayout
@@ -239,7 +311,8 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical"
                 android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp">
+                android:layout_marginRight="10dp"
+                android:layout_marginBottom="10dp">
 
                 <ScrollView android:id="@+id/sencond_login_form" android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -249,7 +322,8 @@
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal">
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="10dp">
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -263,36 +337,39 @@
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
                                 android:layout_weight="32"
+                                android:background="@drawable/textedit_style"
+                                android:paddingTop="5dp"
+                                android:paddingBottom="5dp"
                                 />
                         </LinearLayout>
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="工位数目 "
-                                android:layout_gravity="center"
-                                android:layout_weight="2"
-                                android:textColor="@android:color/black">
-                            </TextView>
-                            <EditText
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:layout_weight="32"
-                                />
-                        </LinearLayout>
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal">
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="10dp">
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="螺栓类型 "
                                 android:layout_gravity="center"
+                                android:textColor="@android:color/black">
+                            </TextView>
+                            <Spinner android:id="@+id/spinnerclass"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                            />
+                        </LinearLayout>
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="10dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="螺栓数目 "
+                                android:layout_gravity="center"
                                 android:layout_weight="2"
                                 android:textColor="@android:color/black">
                             </TextView>
@@ -301,12 +378,16 @@
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
                                 android:layout_weight="32"
+                                android:background="@drawable/textedit_style"
+                                android:paddingTop="5dp"
+                                android:paddingBottom="5dp"
                                 />
                         </LinearLayout>
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal">
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="10dp">
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -320,12 +401,16 @@
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
                                 android:layout_weight="32"
+                                android:background="@drawable/textedit_style"
+                                android:paddingTop="5dp"
+                                android:paddingBottom="5dp"
                                 />
                         </LinearLayout>
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal">
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="10dp">
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -339,12 +424,16 @@
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
                                 android:layout_weight="32"
+                                android:background="@drawable/textedit_style"
+                                android:paddingTop="5dp"
+                                android:paddingBottom="5dp"
                                 />
                         </LinearLayout>
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal">
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="10dp">
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -358,12 +447,16 @@
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
                                 android:layout_weight="32"
+                                android:background="@drawable/textedit_style"
+                                android:paddingTop="5dp"
+                                android:paddingBottom="5dp"
                                 />
                         </LinearLayout>
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal">
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="10dp">
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -378,6 +471,9 @@
                                 android:layout_gravity="center"
                                 android:layout_weight="32"
                                 android:inputType="textMultiLine"
+                                android:background="@drawable/textedit_style"
+                                android:paddingTop="5dp"
+                                android:paddingBottom="5dp"
                                 />
                         </LinearLayout>
                     </LinearLayout>

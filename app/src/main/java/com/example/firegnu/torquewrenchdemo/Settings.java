@@ -3,11 +3,14 @@ package com.example.firegnu.torquewrenchdemo;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -25,6 +28,14 @@ public class Settings extends Activity {
         setHasEmbeddedTabs(actionBar,false);
         setTitle("扭矩扳手工作正常");
         getActionBar().setIcon(R.drawable.userlogo);
+
+        Button logoutButton = (Button) findViewById(R.id.logoutbutton);
+        logoutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                logout();
+            }
+        });
     }
 
 
@@ -59,6 +70,16 @@ public class Settings extends Activity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public void logout() {
+        Intent intent = new Intent(this, LoginActivity.class);
+        //finish all tasks API11+
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
+                Intent.FLAG_ACTIVITY_CLEAR_TASK |
+                Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        this.finish();
     }
 
     public static void setHasEmbeddedTabs(Object inActionBar, final boolean inHasEmbeddedTabs)

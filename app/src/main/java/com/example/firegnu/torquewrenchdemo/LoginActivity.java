@@ -1,14 +1,23 @@
 package com.example.firegnu.torquewrenchdemo;
 
+import android.app.ActionBar;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.TypedValue;
+import android.view.Display;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 
 public class LoginActivity extends Activity {
@@ -17,7 +26,8 @@ public class LoginActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
+        final ActionBar actionBar = getActionBar();
+        actionBar.setDisplayShowHomeEnabled(false);
         ImageButton preUserButton = (ImageButton) findViewById(R.id.preuserbutton);
         preUserButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -41,6 +51,38 @@ public class LoginActivity extends Activity {
                 attempLogin();
             }
         });
+
+        Display display = getWindowManager().getDefaultDisplay();
+        int height = display.getHeight() - 2 * getActionBarHeight();
+        int halfSizeHeightDp = px2dip(this, height);
+        ImageView view = (ImageView)findViewById(R.id.userlogo);
+        LinearLayout.LayoutParams parms = new LinearLayout.LayoutParams(halfSizeHeightDp/4,halfSizeHeightDp/4);
+        parms.setMargins(0, 0,
+                0, 0);
+        parms.gravity = Gravity.CENTER;
+        view.setLayoutParams(parms);
+
+        /*LinearLayout copyRightLabel = (LinearLayout)findViewById(R.id.copyrightLayout);
+        LinearLayout.LayoutParams parmsCopyRight = (LinearLayout.LayoutParams)copyRightLabel.getLayoutParams();//new LinearLayout.LayoutParams(display.getWidth(), getActionBarHeight());
+        copyRightLabel.height =*/
+
+    }
+
+    public static int px2dip(Context context, float pxValue) {
+        float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (pxValue / scale + 0.5f);
+    }
+
+    private int getActionBarHeight() {
+        int actionBarHeight = getActionBar().getHeight();
+        if (actionBarHeight != 0)
+            return actionBarHeight;
+        final TypedValue tv = new TypedValue();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            if (getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true))
+                actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
+        }
+        return actionBarHeight;
     }
 
     public void preUser() {

@@ -2,13 +2,29 @@ package com.example.firegnu.torquewrenchdemo;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.CalendarView;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.PopupWindow;
+import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -16,9 +32,33 @@ import android.widget.TextView;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 
 public class ScanHistory extends Activity {
+
+    private int year;
+    private int month;
+    private int day;
+    private EditText showDate;
+    private List<String> list = new ArrayList<String>();
+    private Spinner spinnerPerson;
+    private ArrayAdapter<String> adapterPerson;
+    private String selectedPerson = "";
+
+    private List<String> listPara = new ArrayList<String>();
+    private Spinner spinnerPara;
+    private ArrayAdapter<String> adapterPara;
+    private String selectedPara = "";
+
+    private List<String> listName = new ArrayList<String>();
+    private Spinner spinnerName;
+    private ArrayAdapter<String> adapterName;
+    private String selectedName = "";
 
     public class TableCellView {
         public String dipanhao;
@@ -113,8 +153,150 @@ public class ScanHistory extends Activity {
             }
             bodyTable.addView(table_row);
         }
+
+        Calendar mycalendar=Calendar.getInstance(Locale.CHINA);
+        Date mydate=new Date();
+        mycalendar.setTime(mydate);
+
+        year = mycalendar.get(Calendar.YEAR);
+        month = mycalendar.get(Calendar.MONTH);
+        day = mycalendar.get(Calendar.DAY_OF_MONTH);
+
+        ImageButton datePickerButton = (ImageButton) findViewById(R.id.dateselectorbutton);
+        datePickerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DatePickerDialog datePicker = new DatePickerDialog(ScanHistory.this, Datelistener,year,month,day);
+                datePicker.show();
+            }
+        });
+        showDate = (EditText)findViewById(R.id.showdatetext);
+        //////////////////////
+        list.add("杨帆");
+        list.add("韩柯");
+        list.add("张翔");
+        list.add("金鑫");
+        list.add("无名");
+        spinnerPerson = (Spinner)findViewById(R.id.spinnerperson);
+        adapterPerson = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, list);
+        adapterPerson.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerPerson.setAdapter(adapterPerson);
+
+        spinnerPerson.setOnItemSelectedListener(new Spinner.OnItemSelectedListener(){
+            public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+                selectedPerson = adapterPerson.getItem(arg2);
+                arg0.setVisibility(View.VISIBLE);
+            }
+            public void onNothingSelected(AdapterView<?> arg0) {
+                // TODO Auto-generated method stub
+                selectedPerson = "";
+                arg0.setVisibility(View.VISIBLE);
+            }
+        });
+
+        spinnerPerson.setOnTouchListener(new Spinner.OnTouchListener(){
+            public boolean onTouch(View v, MotionEvent event) {
+                // TODO Auto-generated method stub
+                return false;
+            }
+        });
+
+        spinnerPerson.setOnFocusChangeListener(new Spinner.OnFocusChangeListener(){
+            public void onFocusChange(View v, boolean hasFocus) {
+                // TODO Auto-generated method stub
+
+            }
+        });
+        ////////////////////////
+        listPara.add("J6P684");
+        listPara.add("M7A142");
+        listPara.add("N8B253");
+        listPara.add("O9C354");
+        listPara.add("P0D475");
+        spinnerPara = (Spinner)findViewById(R.id.spinnerpara);
+        adapterPara = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, listPara);
+        adapterPara.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerPara.setAdapter(adapterPara);
+
+        spinnerPara.setOnItemSelectedListener(new Spinner.OnItemSelectedListener(){
+            public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+                selectedPara = adapterPara.getItem(arg2);
+                arg0.setVisibility(View.VISIBLE);
+            }
+            public void onNothingSelected(AdapterView<?> arg0) {
+                // TODO Auto-generated method stub
+                selectedPara = "";
+                arg0.setVisibility(View.VISIBLE);
+            }
+        });
+
+        spinnerPara.setOnTouchListener(new Spinner.OnTouchListener(){
+            public boolean onTouch(View v, MotionEvent event) {
+                // TODO Auto-generated method stub
+                return false;
+            }
+        });
+
+        spinnerPara.setOnFocusChangeListener(new Spinner.OnFocusChangeListener(){
+            public void onFocusChange(View v, boolean hasFocus) {
+                // TODO Auto-generated method stub
+
+            }
+        });
+        ////////////////////////
+        listName.add("左边轮胎");
+        listName.add("右边轮胎");
+        listName.add("左前轮胎");
+        listName.add("左后轮胎");
+        listName.add("右后轮胎");
+        spinnerName = (Spinner)findViewById(R.id.spinnername);
+        adapterName = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, listName);
+        adapterName.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerName.setAdapter(adapterName);
+
+        spinnerName.setOnItemSelectedListener(new Spinner.OnItemSelectedListener(){
+            public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+                selectedName = adapterName.getItem(arg2);
+                arg0.setVisibility(View.VISIBLE);
+            }
+            public void onNothingSelected(AdapterView<?> arg0) {
+                // TODO Auto-generated method stub
+                selectedPara = "";
+                arg0.setVisibility(View.VISIBLE);
+            }
+        });
+
+        spinnerName.setOnTouchListener(new Spinner.OnTouchListener(){
+            public boolean onTouch(View v, MotionEvent event) {
+                // TODO Auto-generated method stub
+                return false;
+            }
+        });
+
+        spinnerName.setOnFocusChangeListener(new Spinner.OnFocusChangeListener(){
+            public void onFocusChange(View v, boolean hasFocus) {
+                // TODO Auto-generated method stub
+
+            }
+        });
+        ////////////////////////
     }
 
+    private DatePickerDialog.OnDateSetListener Datelistener = new DatePickerDialog.OnDateSetListener()
+    {
+        @Override
+        public void onDateSet(DatePicker view, int myyear, int monthOfYear,int dayOfMonth) {
+            year=myyear;
+            month=monthOfYear;
+            day=dayOfMonth;
+            updateDate();
+        }
+
+        private void updateDate()
+        {
+            showDate.setText(year+"/"+(month+1)+"/"+day);
+        }
+    };
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

@@ -1,0 +1,33 @@
+<resources>
+    <color name="theme_default_primary">#FFCF3C0C</color>
+    <color name="theme_default_primary_dark">#FFF9671E</color>
+    <color name="theme_accent">#ff4081</color>
+    <color name="theme_window_background">#ffebecee</color>
+
+    <!-- general text colors -->
+    <color name="text">#ff484848</color>
+    <color name="secondary">#727272</color>
+    <color name="hint">#B8B8B8</color>
+    <color name="dividers">#DADADA</color>
+
+    <!-- general colors for drawer -->
+    <color name="list_background">#F2F2F2</color>
+    <!-- primary colors for drawer -->
+    <color name="list_background_normal">#FCFCFC</color>
+    <!-- secondary colors for drawer -->
+    <color name="list_background_secondary_normal">#F2F2F2</color>
+    <color name="cardview_initial_background">#71C3DE</color>
+    <color name="outofdate_background">#885678</color>
+    <color name="shadow">#cc222222</color>
+    <color name="transparent">#00000000</color>
+    <color name="tab_highlight">#ff9ecfbf</color>
+    <color name="loginbutton">#FFF9671E</color>
+    <color name="editwhite">#FFFFFFFF</color>
+    <color name="greenbutton">#FF35CF3B</color>
+
+    <color name="backgroundcolor">#ffebecee</color>
+    <color name="loginbackgroundcolor">#ffffffff</color>
+    <color name="loginoutbuttoncolor">#ffff4b55</color>
+    <color name="readedmessage">#bdbdbd</color>color>
+    <color name="pureblack">#000</color>
+</resources>

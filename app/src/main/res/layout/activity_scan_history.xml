@@ -1,9 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="fill_parent"
-    android:background="#FFFFFF"
+    android:background="@color/backgroundcolor"
     android:layout_height="fill_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="15dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="检测时间"
+            >
+        </TextView>
 
+        <EditText
+            android:id="@+id/showdatetext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/textedit_style"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:paddingLeft="5dp"
+            android:layout_weight="1"/>
+        <ImageButton
+            android:id="@+id/dateselectorbutton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_action_go_to_today"
+            android:background="@android:color/transparent"
+            android:layout_gravity="center"
+            android:layout_marginRight="10dp"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="检测人员"
+            >
+        </TextView>
+        <Spinner android:id="@+id/spinnerperson"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="车辆型号"
+            >
+        </TextView>
+        <Spinner android:id="@+id/spinnerpara"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="零件名称"
+            >
+        </TextView>
+            <Spinner android:id="@+id/spinnername"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+
+        </LinearLayout>
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="0.5dp"
+        android:background="@color/text"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="15dp"/>
     <com.example.firegnu.torquewrenchdemo.ListViewTable
         android:layout_width="match_parent"
         android:layout_height="match_parent"
