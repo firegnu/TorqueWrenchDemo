@@ -22,4 +22,5 @@
     <string name="header_text8">时间</string>
     <string name="header_text9">结果</string>
     <string name="dummy">Dummy</string>
+    <string name="action_add_seraddress">添加服务器</string>
 </resources>

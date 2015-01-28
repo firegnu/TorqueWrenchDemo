@@ -1,11 +1,23 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="@color/backgroundcolor"
+    android:orientation="vertical"
     >
-
-
+    <ProgressBar android:id="@+id/update_progress"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_weight="20">
     <ScrollView android:id="@+id/login_form" android:layout_width="match_parent"
         android:layout_height="match_parent"
         >
@@ -23,31 +35,61 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="关联用户班组"/>
-            <EditText
+                android:text="关联用户班组"
+                android:layout_gravity="center"/>
+            <FrameLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:background="@drawable/textedit_style"
-                android:paddingTop="5dp"
-                android:paddingBottom="5dp"/>
+                android:layout_weight="10">
+                <EditText
+                    android:id="@+id/savegroupedit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    />
+
+                <ImageButton
+                    android:id="@+id/savegroupbutton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_action_send_now"
+                    android:background="@android:color/transparent"
+                    android:layout_gravity="right|center_vertical"
+                    />
+            </FrameLayout>
         </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="20dp">
+        android:layout_marginTop="5dp">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="关联扭矩扳手ID"/>
-        <EditText
+            android:text="关联扭矩扳手ID"
+            android:layout_gravity="center"/>
+        <FrameLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:background="@drawable/textedit_style"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp"/>
+            android:layout_weight="10"
+           >
+            <EditText
+                android:id="@+id/savebanshouidedit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                />
+
+            <ImageButton
+                android:id="@+id/savebanshouidbutton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_action_send_now"
+                android:background="@android:color/transparent"
+                android:layout_gravity="right|center_vertical"
+                />
+        </FrameLayout>
+
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -57,14 +99,29 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="扳手监测周期（单位：秒）"/>
-        <EditText
+            android:text="扳手监测周期（单位：秒）"
+            android:layout_gravity="center"/>
+        <FrameLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:background="@drawable/textedit_style"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp"/>
+            android:layout_weight="10"
+            >
+            <EditText
+                android:id="@+id/banshouwatchtimeedit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                />
+
+            <ImageButton
+                android:id="@+id/banshouwatchtimebutton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_action_send_now"
+                android:background="@android:color/transparent"
+                android:layout_gravity="right|center_vertical"
+                />
+        </FrameLayout>
     </LinearLayout>
     <Button
         android:id="@+id/connectbanshoubutton"
@@ -74,7 +131,8 @@
         android:layout_marginTop="5dp"
         android:textColor="#fff"
         android:background="@drawable/settings_button_style"
-        android:padding="10dp"/>
+        android:padding="10dp"
+        style="?android:attr/buttonStyleSmall" />
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -94,6 +152,7 @@
             android:text="自动同步数据"
             android:layout_marginRight="5dp"/>
         <Switch
+            android:id="@+id/autorefreshdataswitch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
     </LinearLayout>
@@ -105,16 +164,29 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="数据同步周期（单位：天）"/>
-        <EditText
+            android:text="数据同步周期（单位：天）"
+            android:layout_gravity="center"/>
+        <FrameLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:text="7"
-            android:textAlignment="center"
-            android:background="@drawable/textedit_style"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp"/>
+            android:layout_weight="10"
+            >
+            <EditText
+                android:id="@+id/datawatchtimeedit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                />
+
+            <ImageButton
+                android:id="@+id/datawatchtimebutton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_action_send_now"
+                android:background="@android:color/transparent"
+                android:layout_gravity="right|center_vertical"
+                />
+        </FrameLayout>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -127,21 +199,27 @@
             android:text="数据同步状态"
             android:layout_marginRight="5dp"/>
         <Switch
+            android:id="@+id/syncstausswitch"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:checked="true"/>
     </LinearLayout>
     <Button
+        android:id="@+id/immediateasyndatafromserver"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="立即同步数据"
         android:layout_marginTop="5dp"
         android:textColor="#fff"
         android:background="@drawable/settings_button_style"
-        android:padding="10dp"/>
+        android:padding="10dp"
+        style="?android:attr/buttonStyleSmall" />
     <TextView
+        android:id="@+id/lastsynctimetextview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="上次同步数据时间：2015/01/20 09:50:20"
+        android:text=""
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
         android:layout_gravity="center"
@@ -152,15 +230,16 @@
         android:orientation="horizontal"
         android:layout_marginTop="10dp">
         <TextView
+
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="输入旧密码"
             android:layout_marginRight="5dp"/>
         <EditText
+            android:id="@+id/settingsoldpassword"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="2"
-            android:background="@drawable/textedit_style"
             android:paddingTop="5dp"
             android:paddingBottom="5dp"/>
     </LinearLayout>
@@ -170,15 +249,16 @@
         android:orientation="horizontal"
         android:layout_marginTop="10dp">
         <TextView
+
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="输入新密码"
             android:layout_marginRight="5dp"/>
         <EditText
+            android:id="@+id/settingsnewpassword"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="2"
-            android:background="@drawable/textedit_style"
             android:paddingTop="5dp"
             android:paddingBottom="5dp"/>
     </LinearLayout>
@@ -193,14 +273,15 @@
             android:text="确认新密码"
             android:layout_marginRight="5dp"/>
         <EditText
+            android:id="@+id/settingsrenewpassword"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="2"
-            android:background="@drawable/textedit_style"
             android:paddingTop="5dp"
             android:paddingBottom="5dp"/>
     </LinearLayout>
     <Button
+        android:id="@+id/modifyuserpasswordbutton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="修改密码"
@@ -208,10 +289,12 @@
         android:layout_gravity="end"
         android:textColor="#fff"
         android:background="@drawable/settings_button_style"
-        android:padding="10dp"/>
+        android:padding="10dp"
+        style="?android:attr/buttonStyleSmall" />
 
     </LinearLayout>
     </ScrollView>
+    </LinearLayout>
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/settingsbuttonLayout"
         android:layout_width="match_parent"
@@ -219,6 +302,7 @@
         android:orientation="horizontal"
         android:padding="10dp"
         android:layout_alignParentBottom="true"
+        android:layout_weight="1"
         >
         <Button
             android:id="@+id/logoutbutton"
@@ -230,4 +314,4 @@
             >
         </Button>
     </LinearLayout>
-</RelativeLayout>
+</LinearLayout>

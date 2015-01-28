@@ -3,6 +3,7 @@
     android:layout_height="match_parent"
     tools:context=".LoginActivity"
     android:background="@color/backgroundcolor">
+    <!--android:background="@drawable/textedit_style"-->
     <ProgressBar android:id="@+id/login_progress" style="?android:attr/progressBarStyleLarge"
         android:layout_width="wrap_content" android:layout_height="wrap_content"
         android:layout_marginBottom="8dp" android:visibility="gone"
@@ -34,6 +35,7 @@
                 android:background="@android:color/transparent"
                 android:layout_gravity="center"
                 android:layout_weight="4"
+                android:layout_marginRight="10dp"
                 />
             <com.example.firegnu.torquewrenchdemo.RoundedImageView
                 android:id="@+id/userlogo"
@@ -52,11 +54,12 @@
                     android:background="@android:color/transparent"
                     android:layout_gravity="center"
                     android:layout_weight="4"
+                    android:layout_marginLeft="10dp"
                     />
             </LinearLayout>
             <TextView android:id="@+id/username" android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="杨帆"
+                android:text=""
                 android:layout_gravity="center"/>
             <EditText android:id="@+id/password" android:layout_width="match_parent"
                 android:layout_height="wrap_content" android:hint="@string/prompt_password"
@@ -76,6 +79,12 @@
                 android:textColor="#fff"
                 android:background="@drawable/loginbutton_rect_list_normal"
                 />
+            <Button android:id="@+id/addserveraddress" style="?android:textAppearanceSmall"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="16dp" android:text="@string/action_add_seraddress"
+                android:textColor="#fff"
+                android:background="@drawable/loginbutton_rect_list_normal"
+                />
         </LinearLayout>
     </ScrollView>
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -92,7 +101,6 @@
             android:layout_height="wrap_content"
             android:text="CopyRight @ 2015陕西杰创科技有限公司"
             android:layout_gravity="center"
-            android:textSize="18dp"
 
             android:textColor="@android:color/white"/>
     </LinearLayout>

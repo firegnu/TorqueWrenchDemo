@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -21,6 +22,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
@@ -33,20 +35,17 @@ import java.util.List;
 
 
 public class ScanChassisActivity extends Activity {
-
+    MyDatabaseAdapter m_MyDatabaseAdapter;
     LinearLayout firstStepLayout;
     LinearLayout sencondStepLayout;
     LinearLayout thirdStepLayout;
 
-    private List<String> listClass = new ArrayList<String>();
-    private Spinner spinnerClass;
-    private ArrayAdapter<String> adapterClass;
-    private String selectedClass = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan_chassis);
+        m_MyDatabaseAdapter =MyDatabaseAdapter.getDatabaseAdapter(this);
         final ActionBar actionBar = getActionBar();
         setHasEmbeddedTabs(actionBar,false);
         setTitle("扭矩扳手工作正常");
@@ -54,31 +53,6 @@ public class ScanChassisActivity extends Activity {
         firstStepLayout = (LinearLayout)this.findViewById(R.id.firststeplayout);
         sencondStepLayout = (LinearLayout)this.findViewById(R.id.sencondsteplayout);
         thirdStepLayout = (LinearLayout)this.findViewById(R.id.thirdsteplayout);
-
-        LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        LinearLayout firstStepLiearlayout = (LinearLayout)firstStepLayout.findViewById(R.id.firstchildlayout);
-        LinearLayout thirdStepLiearlayout = (LinearLayout)thirdStepLayout.findViewById(R.id.thirdchildlayout);
-        //firststep layout add test data
-        for(int i = 0; i < 20; i++) {
-            final LinearLayout lingjianCodeLayout = (LinearLayout) layoutInflater.inflate(R.layout.dipan_lingjian_code, null);
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-            lp.setMargins(0, 0,
-                    0, 10);
-            lingjianCodeLayout.setLayoutParams(lp);
-
-            firstStepLiearlayout.addView(lingjianCodeLayout);
-        }
-        //
-        //thirdstep layout add test data
-        for(int i = 0; i < 8; i++) {
-            final LinearLayout luosiLayout = (LinearLayout) layoutInflater.inflate(R.layout.test_torque_wrench, null);
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-            lp.setMargins(0, 0,
-                    10, 10);
-            luosiLayout.setLayoutParams(lp);
-            thirdStepLiearlayout.addView(luosiLayout);
-        }
-        //
 
         final Button firstStepButton = (Button) findViewById(R.id.firststepbutton);
         final Button sencondStepButton = (Button) findViewById(R.id.sencondstepbutton);
@@ -127,6 +101,7 @@ public class ScanChassisActivity extends Activity {
             public void onClick(View view) {
                 Intent intent = new Intent("com.google.zxing.client.android.SCAN");
                 intent.putExtra("SCAN_MODE", "QR_CODE_MODE, PRODUCT_MODE");
+                intent.putExtra("PROMPT_MESSAGE", "开始扫描底盘Vin码");
                 startActivityForResult(intent, 0);
             }
         });
@@ -137,46 +112,10 @@ public class ScanChassisActivity extends Activity {
             public void onClick(View view) {
                 Intent intent = new Intent("com.google.zxing.client.android.SCAN");
                 intent.putExtra("SCAN_MODE", "QR_CODE_MODE, PRODUCT_MODE");
+                intent.putExtra("PROMPT_MESSAGE", "开始扫描零件号");
                 startActivityForResult(intent, 0);
             }
         });
-        ////////////////////////
-        listClass.add("M16");
-        listClass.add("M15");
-        listClass.add("M14");
-        listClass.add("M13");
-        listClass.add("M12");
-        spinnerClass = (Spinner)findViewById(R.id.spinnerclass);
-        adapterClass = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, listClass);
-        adapterClass.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerClass.setAdapter(adapterClass);
-
-        spinnerClass.setOnItemSelectedListener(new Spinner.OnItemSelectedListener(){
-            public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-                selectedClass = adapterClass.getItem(arg2);
-                arg0.setVisibility(View.VISIBLE);
-            }
-            public void onNothingSelected(AdapterView<?> arg0) {
-                // TODO Auto-generated method stub
-                selectedClass = "";
-                arg0.setVisibility(View.VISIBLE);
-            }
-        });
-
-        spinnerClass.setOnTouchListener(new Spinner.OnTouchListener(){
-            public boolean onTouch(View v, MotionEvent event) {
-                // TODO Auto-generated method stub
-                return false;
-            }
-        });
-
-        spinnerClass.setOnFocusChangeListener(new Spinner.OnFocusChangeListener(){
-            public void onFocusChange(View v, boolean hasFocus) {
-                // TODO Auto-generated method stub
-
-            }
-        });
-        ////////////////////////
     }
 
     @Override
@@ -187,16 +126,132 @@ public class ScanChassisActivity extends Activity {
                 if(firstStepLayout.getVisibility() == View.VISIBLE) {
                     EditText firstResult = (EditText)findViewById(R.id.firstscanresulttextview);
                     firstResult.setText(contents.toString());
-
-                    EditText firstResultSuccessful = (EditText)findViewById(R.id.firstresultsuccesful);
-                    firstResultSuccessful.setText("查询成功");
+                    ///
+                    LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                    LinearLayout firstStepLiearlayout = (LinearLayout)firstStepLayout.findViewById(R.id.firstchildlayout);
+                    firstStepLiearlayout.removeAllViews();
+                    //
+                    String carMode = m_MyDatabaseAdapter.getInfoFromVinCode(contents.toString());//
+                    if(!carMode.equals("")) {
+                        EditText firstResultSuccessful = (EditText)findViewById(R.id.firstresultsuccesful);
+                        firstResultSuccessful.setText("查询成功");
+                        //carmodel
+                        final LinearLayout lingjianModelLayout = (LinearLayout) layoutInflater.inflate(R.layout.firststepcarmodelname, null);
+                        LinearLayout.LayoutParams lpCarModel = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+                        lpCarModel.setMargins(0, 0,
+                                0, 10);
+                        lingjianModelLayout.setLayoutParams(lpCarModel);
+                        EditText firstCarModelResult = (EditText)lingjianModelLayout.findViewById(R.id.vincodecarmodelfirstedit);
+                        firstCarModelResult.setText(carMode);
+                        firstStepLiearlayout.addView(lingjianModelLayout);
+                        //
+                        List<String> partNoList = new ArrayList<String>();
+                        Cursor cur = m_MyDatabaseAdapter.getPartListfromCarModel(carMode);
+                        if (cur != null) {
+                            if (cur.moveToFirst()) {
+                                do {
+                                    String partNo = cur.getString(0);
+                                    partNoList.add(partNo);
+                                } while (cur.moveToNext());
+                            }
+                            cur.close();
+                        }
+                        for(int i = 0; i < partNoList.size(); i++) {
+                            final LinearLayout lingjianCodeLayout = (LinearLayout) layoutInflater.inflate(R.layout.dipan_lingjian_code, null);
+                            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+                            lp.setMargins(0, 0,
+                                    0, 10);
+                            lingjianCodeLayout.setLayoutParams(lp);
+                            firstStepLiearlayout.addView(lingjianCodeLayout);
+                            TextView lingjianName = (TextView)lingjianCodeLayout.findViewById(R.id.lingjianpartnotextview);
+                            lingjianName.setText(partNoList.get(i).toString());
+                        }
+                    }
+                    else {
+                        EditText firstResultSuccessful = (EditText)findViewById(R.id.firstresultsuccesful);
+                        firstResultSuccessful.setText("查询失败");
+                    }
                 }
                 else if(sencondStepLayout.getVisibility() == View.VISIBLE) {
                     EditText sencondResult = (EditText)findViewById(R.id.sencondscanresulttextview);
                     sencondResult.setText(contents.toString());
-
+                    /////
+                    LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                    LinearLayout thirdStepLiearlayout = (LinearLayout)thirdStepLayout.findViewById(R.id.thirdchildlayout);
+                    thirdStepLiearlayout.removeAllViews();
                     EditText sencondResultSuccessful = (EditText)findViewById(R.id.sencondResultSuccessful);
-                    sencondResultSuccessful.setText("查询成功");
+                    //sencondstep layout add test data
+                    Cursor cur = m_MyDatabaseAdapter.getPartInfoFromPartNo(contents.toString());//
+                    Boolean bQuery = false;
+                    String partName = "";
+                    String boltType = "";
+                    int boltNum = 0;
+                    float stardardValue = 0;
+                    float valueRange = 0;
+                    float limitRange = 0;
+                    String workmanShip = "";
+                    //
+                    final LinearLayout sencondResultLayout = (LinearLayout) layoutInflater.inflate(R.layout.sencondscanresult, null);
+                    EditText sencondPartName = (EditText)sencondResultLayout.findViewById(R.id.sencondpartname);
+                    sencondPartName.setText("");
+                    EditText sencondBoldType = (EditText)sencondResultLayout.findViewById(R.id.boldtype);
+                    sencondBoldType.setText("");
+                    EditText sencondBoldNum = (EditText)sencondResultLayout.findViewById(R.id.boldnum);
+                    sencondBoldNum.setText("");
+                    EditText sencondStardardValue = (EditText)sencondResultLayout.findViewById(R.id.stardardvalue);
+                    sencondStardardValue.setText("");
+                    EditText sencondValueRange = (EditText)sencondResultLayout.findViewById(R.id.valueRange);
+                    sencondValueRange.setText("");
+                    EditText sencondLimitRange = (EditText)sencondResultLayout.findViewById(R.id.limitrange);
+                    sencondLimitRange.setText("");
+                    EditText sencondWorkManShip = (EditText)sencondResultLayout.findViewById(R.id.workmanship);
+                    sencondWorkManShip.setText("");
+
+                    if (cur != null) {
+                        if (cur.moveToFirst()) {
+                            do {
+                                bQuery = true;
+                                partName = cur.getString(0);
+                                boltType = cur.getString(1);
+                                boltNum = cur.getInt(2);
+                                stardardValue = cur.getFloat(3);
+                                valueRange = cur.getFloat(4);
+                                limitRange = cur.getFloat(5);
+                                workmanShip = cur.getString(6);
+                            } while (cur.moveToNext());
+                        }
+                        cur.close();
+                    }
+                    if(bQuery) {
+                        sencondResultSuccessful.setText("查询成功");
+                        //
+                        LinearLayout.LayoutParams lpsencondResult = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+                        lpsencondResult.setMargins(0, 0,
+                                0, 10);
+                        sencondResultLayout.setLayoutParams(lpsencondResult);
+                        final LinearLayout sencondLayout = (LinearLayout)findViewById(R.id.sencondscanresult);
+                        sencondLayout.addView(sencondResultLayout);
+                        //
+                        sencondPartName.setText(partName);
+                        sencondBoldType.setText(boltType);
+                        sencondBoldNum.setText(Integer.toString(boltNum));
+                        sencondStardardValue.setText(Float.toString(stardardValue));
+                        sencondValueRange.setText(Float.toString(valueRange));
+                        sencondLimitRange.setText(Float.toString(limitRange));
+                        sencondWorkManShip.setText(workmanShip);
+                        for(int i = 0; i < boltNum; i++) {
+                            final LinearLayout luosiLayout = (LinearLayout) layoutInflater.inflate(R.layout.test_torque_wrench, null);
+                            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+                            lp.setMargins(0, 0,
+                                    10, 10);
+                            luosiLayout.setLayoutParams(lp);
+                            thirdStepLiearlayout.addView(luosiLayout);
+                        }
+                    }
+                    else {
+                        sencondResultSuccessful.setText("查询失败");
+                    }
+                    /**/
                 }
             }
         }
