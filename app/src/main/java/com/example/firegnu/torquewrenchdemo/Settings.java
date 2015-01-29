@@ -189,9 +189,7 @@ public class Settings extends Activity {
 
         SharedPreferences settingsDataWatchTime = getApplicationContext().getSharedPreferences("dataWatchTime", 0);
         String dataWatchTime = settingsDataWatchTime.getString("dataWatchTime", "");
-        if(dataWatchTime.equals("")) {
-            dataWatchTimeEdit.setText("7");
-        }
+        dataWatchTimeEdit.setText(dataWatchTime);
 
         SharedPreferences settingsAutoRefresh = getApplicationContext().getSharedPreferences("bAutoRefresh", 0);
         Boolean bDataRefresh = settingsAutoRefresh.getBoolean("bAutoRefresh", false);
@@ -204,7 +202,7 @@ public class Settings extends Activity {
             lastSyncTimeTextView.setText("上次同步数据时间：" + lastSyncTime);
         }
         else {
-            lastSyncTimeTextView.setText("never sync!");
+            lastSyncTimeTextView.setText("你还未做过同步!");
         }
     }
 

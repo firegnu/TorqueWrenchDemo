@@ -67,5 +67,14 @@ public class DataHolder {
     public static void setServerAddress(String serverAddress) {
         DataHolder.serverAddress = serverAddress;
     }
+
+    //set bluetooth device mac address
+    private static String blueToothDeviceAddress = "";
+    public static String getBlueToothDeviceAddress() {
+        return blueToothDeviceAddress;
+    }
+    public static void setBlueToothDeviceAddress(String blueToothDeviceAddress) {
+        DataHolder.blueToothDeviceAddress = blueToothDeviceAddress;
+    }
 }
 

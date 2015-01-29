@@ -7,11 +7,27 @@
     android:paddingLeft="5dp"
     android:paddingRight="5dp"
     android:paddingBottom="0dp">
-    <ImageView
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_gravity="center">
+    <ImageButton
+        android:id="@+id/luoshuanbutton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:src="@drawable/userlogo"
-        android:paddingRight="5dp"/>
+        android:paddingRight="5dp"
+        android:layout_gravity="center"
+        android:background="@android:color/transparent"/>
+        <TextView
+            android:id="@+id/gongweimingchengtextview"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="工位名称"/>
+    </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -22,11 +38,13 @@
             android:orientation="horizontal"
             android:layout_marginBottom="10dp">
             <TextView
+                android:id="@+id/textview1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="首测扭矩"
                 />
             <EditText
+                android:id="@+id/shoucetextedit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
@@ -34,10 +52,12 @@
                 android:paddingBottom="5dp"
                 android:editable="false"/>
             <TextView
+                android:id="@+id/textview2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="首测时间"/>
             <EditText
+                android:id="@+id/shoucetimetextedit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
@@ -45,9 +65,12 @@
                 android:paddingBottom="5dp"
                 android:editable="false"/>
             <CheckBox
+                android:id="@+id/shoucecheckbox"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:clickable="false"/>
             <TextView
+                android:id="@+id/shouceresult"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="未检测"
@@ -58,10 +81,12 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
             <TextView
+                android:id="@+id/textview3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="修正扭矩"/>
             <EditText
+                android:id="@+id/xiuzhengtextedit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
@@ -69,10 +94,12 @@
                 android:paddingBottom="5dp"
                 android:editable="false"/>
             <TextView
+                android:id="@+id/textview4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="修正时间"/>
             <EditText
+                android:id="@+id/xiuzhengtimetextedit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
@@ -80,9 +107,12 @@
                 android:paddingBottom="5dp"
                 android:editable="false"/>
             <CheckBox
+                android:id="@+id/xiuzhengcheckbox"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:clickable="false"/>
             <TextView
+                android:id="@+id/xiuzhengresult"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="未检测"/>

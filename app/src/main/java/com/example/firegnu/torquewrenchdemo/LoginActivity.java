@@ -6,15 +6,29 @@ import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattService;
+import android.bluetooth.BluetoothManager;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.TypedValue;
+import android.os.Handler;
+import android.os.IBinder;
+import android.provider.ContactsContract;
+import android.util.*;
+import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -23,12 +37,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ExpandableListView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.SimpleExpandableListAdapter;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.squareup.picasso.Picasso;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -58,6 +76,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -75,12 +94,15 @@ public class LoginActivity extends Activity {
     private List<Integer> groupIdList = new ArrayList<Integer>();
     private int userIndex = 0;
     TextView userNameTextView;
+    ImageView publisherPhotoView;
     private View mProgressView;
+    //
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        initAllDefaultParameter();
         m_MyDatabaseAdapter = MyDatabaseAdapter.getDatabaseAdapter(this);
         mProgressView = findViewById(R.id.login_progress);
 
@@ -180,13 +202,57 @@ public class LoginActivity extends Activity {
             }
             cur.close();
         }
+        SharedPreferences settings = getApplicationContext().getSharedPreferences("serveraddress", 0);
+        String serverAddress = settings.getString("serveraddress", "");
+        DataHolder.setServerAddress(serverAddress);
         userNameTextView = (TextView) findViewById(R.id.username);
+        publisherPhotoView = (ImageView)findViewById(R.id.userlogo);
         if (nameList.size() == 0) {
             userNameTextView.setText("数据库为空");
             loginButton.setEnabled(false);
             updateEmptyDatabase();
         } else {
             userNameTextView.setText(nameList.get(userIndex).toString());
+            if(photoList.get(userIndex) != null) {
+                Picasso.with(this).load("http://" + DataHolder.getServerAddress() + photoList.get(userIndex).toString()).into(publisherPhotoView);
+            }
+        }
+        //auto connect to bluetooth device
+
+    }
+
+    //set default value
+    public void initAllDefaultParameter() {
+        SharedPreferences settingsGroupName = getApplicationContext().getSharedPreferences("groupName", 0);
+        String groupName = settingsGroupName.getString("groupName", "");
+        if(groupName.equals("")) {
+            SharedPreferences.Editor editorGroupName = settingsGroupName.edit();
+            editorGroupName.putString("groupName", "01班组");
+            editorGroupName.apply();
+        }
+
+        SharedPreferences settingsBanshouName = getApplicationContext().getSharedPreferences("banshouName", 0);
+        String banshouName = settingsBanshouName.getString("banshouName", "");
+        if(banshouName.equals("")) {
+            SharedPreferences.Editor editorBanshouName = settingsBanshouName.edit();
+            editorBanshouName.putString("banshouName", "18:7A:93:04:A3:4A");
+            editorBanshouName.apply();
+        }
+
+        SharedPreferences settingsBanshouWatchTime = getApplicationContext().getSharedPreferences("banshouWatchTime", 0);
+        String banshouWatchTime = settingsBanshouWatchTime.getString("banshouWatchTime", "");
+        if(banshouWatchTime.equals("")) {
+            SharedPreferences.Editor editorBanshouWatchTime = settingsBanshouWatchTime.edit();
+            editorBanshouWatchTime.putString("banshouWatchTime", "10");
+            editorBanshouWatchTime.apply();
+        }
+
+        SharedPreferences settingsDataWatchTime = getApplicationContext().getSharedPreferences("dataWatchTime", 0);
+        String dataWatchTime = settingsDataWatchTime.getString("dataWatchTime", "");
+        if(dataWatchTime.equals("")) {
+            SharedPreferences.Editor editorDataWatchTime = settingsDataWatchTime.edit();
+            editorDataWatchTime.putString("dataWatchTime", "7");
+            editorDataWatchTime.apply();
         }
     }
 
@@ -211,6 +277,7 @@ public class LoginActivity extends Activity {
         if (userIndex > 0) {
             userIndex -= 1;
             userNameTextView.setText(nameList.get(userIndex).toString());
+            Picasso.with(this).load("http://" + DataHolder.getServerAddress() + photoList.get(userIndex).toString()).into(publisherPhotoView);
         }
     }
 
@@ -218,6 +285,7 @@ public class LoginActivity extends Activity {
         if (userIndex < idList.size() - 1) {
             userIndex += 1;
             userNameTextView.setText(nameList.get(userIndex).toString());
+            Picasso.with(this).load("http://" + DataHolder.getServerAddress() + photoList.get(userIndex).toString()).into(publisherPhotoView);
         }
     }
 
@@ -579,9 +647,10 @@ public class LoginActivity extends Activity {
             editorlastAsyncTime.putString("lastAsyncTime", resultCommentStr);
             editorlastAsyncTime.apply();
 
-            Intent intent = new Intent(LoginActivity.this, ScanChassisActivity.class);
+            /*Intent intent = new Intent(LoginActivity.this, ScanChassisActivity.class);
             startActivity(intent);
-            finish();
+            finish();*/
+            logout();
 
             super.onPostExecute(result);
         }
@@ -618,5 +687,15 @@ public class LoginActivity extends Activity {
             e.printStackTrace();
         }
         return dayDiff;
+    }
+
+    public void logout() {
+        Intent intent = new Intent(this, LoginActivity.class);
+        //finish all tasks API11+
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
+                Intent.FLAG_ACTIVITY_CLEAR_TASK |
+                Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        this.finish();
     }
 }
