@@ -19,15 +19,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
-import android.util.*;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -35,7 +32,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -44,14 +40,10 @@ import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.google.zxing.integration.android.IntentIntegrator;
-import com.google.zxing.integration.android.IntentResult;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -92,10 +84,15 @@ public class ScanChassisActivity extends Activity {
     private String resultDataStr1 = "";
     private String resultDataStr2 = "";
     private String resultDataStr3 = "";
+    private String resultDataStr4 = "";
 
     int clickedIndex = -1;
 
     private View mProgressView;
+
+    private String gVinCode = "";
+    private String gCarMode = "";
+    private String gPartCode = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -216,8 +213,10 @@ public class ScanChassisActivity extends Activity {
                     LinearLayout firstStepLiearlayout = (LinearLayout)firstStepLayout.findViewById(R.id.firstchildlayout);
                     firstStepLiearlayout.removeAllViews();
                     //
-                    String carMode = m_MyDatabaseAdapter.getInfoFromVinCode(contents.toString());//
+                    String carMode = m_MyDatabaseAdapter.getInfoFromVinCode("'" + contents.toString() + "'");//'E52581'
+                    gVinCode = contents.toString();
                     if(!carMode.equals("")) {
+                        gCarMode = carMode;
                         EditText firstResultSuccessful = (EditText)findViewById(R.id.firstresultsuccesful);
                         firstResultSuccessful.setText("查询成功");
                         //carmodel
@@ -231,7 +230,7 @@ public class ScanChassisActivity extends Activity {
                         firstStepLiearlayout.addView(lingjianModelLayout);
                         //
                         List<String> partNoList = new ArrayList<String>();
-                        Cursor cur = m_MyDatabaseAdapter.getPartListfromCarModel(carMode);
+                        Cursor cur = m_MyDatabaseAdapter.getPartListfromCarModel("'" + carMode + "'");
                         if (cur != null) {
                             if (cur.moveToFirst()) {
                                 do {
@@ -260,13 +259,16 @@ public class ScanChassisActivity extends Activity {
                 else if(sencondStepLayout.getVisibility() == View.VISIBLE) {
                     EditText sencondResult = (EditText)findViewById(R.id.sencondscanresulttextview);
                     sencondResult.setText(contents.toString());
+                    gPartCode = contents.toString();
                     /////
                     LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                     LinearLayout thirdStepLiearlayout = (LinearLayout)thirdStepLayout.findViewById(R.id.thirdchildlayout);
                     thirdStepLiearlayout.removeAllViews();
                     EditText sencondResultSuccessful = (EditText)findViewById(R.id.sencondResultSuccessful);
                     //sencondstep layout add test data
-                    Cursor cur = m_MyDatabaseAdapter.getPartInfoFromPartNo("1018");//contents.toString()
+                    //String partCode, String vinCode, String model
+                    Cursor cur = m_MyDatabaseAdapter.getPartInfoFromPartNo("'" + contents.toString() + "'",
+                            "'" + gVinCode + "'", "'" + gCarMode + "'");//
                     Boolean bQuery = false;
                     String partName = "";
                     String boltType = "";
@@ -277,32 +279,46 @@ public class ScanChassisActivity extends Activity {
                     String workmanShip = "";
                     //
                     final LinearLayout sencondResultLayout = (LinearLayout) layoutInflater.inflate(R.layout.sencondscanresult, null);
-                    EditText sencondPartName = (EditText)sencondResultLayout.findViewById(R.id.sencondpartname);
+                    final EditText sencondPartName = (EditText)sencondResultLayout.findViewById(R.id.sencondpartname);
                     sencondPartName.setText("");
-                    EditText sencondBoldType = (EditText)sencondResultLayout.findViewById(R.id.boldtype);
-                    sencondBoldType.setText("");
-                    EditText sencondBoldNum = (EditText)sencondResultLayout.findViewById(R.id.boldnum);
+                    Spinner sencondBoldTypeSpinner = (Spinner)sencondResultLayout.findViewById(R.id.boldtype);
+                    //sencondBoldType.setText("");
+                    final EditText sencondBoldNum = (EditText)sencondResultLayout.findViewById(R.id.boldnum);
                     sencondBoldNum.setText("");
-                    EditText sencondStardardValue = (EditText)sencondResultLayout.findViewById(R.id.stardardvalue);
+                    final EditText sencondStardardValue = (EditText)sencondResultLayout.findViewById(R.id.stardardvalue);
                     sencondStardardValue.setText("");
-                    EditText sencondValueRange = (EditText)sencondResultLayout.findViewById(R.id.valueRange);
+                    final EditText sencondValueRange = (EditText)sencondResultLayout.findViewById(R.id.valueRange);
                     sencondValueRange.setText("");
-                    EditText sencondLimitRange = (EditText)sencondResultLayout.findViewById(R.id.limitrange);
+                    final EditText sencondLimitRange = (EditText)sencondResultLayout.findViewById(R.id.limitrange);
                     sencondLimitRange.setText("");
-                    EditText sencondWorkManShip = (EditText)sencondResultLayout.findViewById(R.id.workmanship);
+                    final EditText sencondWorkManShip = (EditText)sencondResultLayout.findViewById(R.id.workmanship);
                     sencondWorkManShip.setText("");
 
+                    final List<String> listBoltType = new ArrayList<String>();
+                    final List<String> partNameList = new ArrayList<String>();
+                    final List<Integer> boltNumList = new ArrayList<Integer>();
+                    final List<Float> stardardValueList = new ArrayList<Float>();
+                    final List<Float> valueRangeList = new ArrayList<Float>();
+                    final List<Float> limitRangeList = new ArrayList<Float>();
+                    final List<String> workmanShipList = new ArrayList<String>();
                     if (cur != null) {
                         if (cur.moveToFirst()) {
                             do {
                                 bQuery = true;
-                                partName = cur.getString(0);
-                                boltType = cur.getString(1);
-                                boltNum = cur.getInt(2);
-                                stardardValue = cur.getFloat(3);
-                                valueRange = cur.getFloat(4);
-                                limitRange = cur.getFloat(5);
-                                workmanShip = cur.getString(6);
+                                partName = cur.getString(3);
+                                partNameList.add(partName);
+                                boltType = cur.getString(2);
+                                listBoltType.add(boltType);
+                                boltNum = cur.getInt(8);
+                                boltNumList.add(boltNum);
+                                stardardValue = cur.getFloat(4);
+                                stardardValueList.add(stardardValue);
+                                valueRange = cur.getFloat(5);
+                                valueRangeList.add(valueRange);
+                                limitRange = cur.getFloat(6);
+                                limitRangeList.add(limitRange);
+                                workmanShip = cur.getString(7);
+                                workmanShipList.add(workmanShip);
                             } while (cur.moveToNext());
                         }
                         cur.close();
@@ -316,15 +332,56 @@ public class ScanChassisActivity extends Activity {
                         sencondResultLayout.setLayoutParams(lpsencondResult);
                         final LinearLayout sencondLayout = (LinearLayout)findViewById(R.id.sencondscanresult);
                         sencondLayout.addView(sencondResultLayout);
-                        //
-                        sencondPartName.setText(partName);
-                        sencondBoldType.setText(boltType);
-                        sencondBoldNum.setText(Integer.toString(boltNum));
-                        sencondStardardValue.setText(Float.toString(stardardValue));
-                        sencondValueRange.setText(Float.toString(valueRange));
-                        sencondLimitRange.setText(Float.toString(limitRange));
-                        sencondWorkManShip.setText(workmanShip);
-                        for(int i = 0; i < boltNum; i++) {
+                        ////////////////
+                        final ArrayAdapter<String> adapterBoltType = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, listBoltType);
+                        adapterBoltType.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                        sencondBoldTypeSpinner.setAdapter(adapterBoltType);
+
+                        sencondBoldTypeSpinner.setOnItemSelectedListener(new Spinner.OnItemSelectedListener(){
+                            public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+                                //selectedPerson = adapterBoltType.getItem(arg2);
+                                sencondPartName.setText(partNameList.get(arg2));
+                                sencondBoldNum.setText(Integer.toString(boltNumList.get(arg2)));
+                                sencondStardardValue.setText(Float.toString(stardardValueList.get(arg2)));
+                                sencondValueRange.setText(Float.toString(valueRangeList.get(arg2)));
+                                sencondLimitRange.setText(Float.toString(limitRangeList.get(arg2)));
+                                sencondWorkManShip.setText(workmanShipList.get(arg2));
+                                arg0.setVisibility(View.VISIBLE);
+                            }
+                            public void onNothingSelected(AdapterView<?> arg0) {
+                                // TODO Auto-generated method stub
+                                //selectedPerson = "";
+                                arg0.setVisibility(View.VISIBLE);
+                            }
+                        });
+
+                        sencondBoldTypeSpinner.setOnTouchListener(new Spinner.OnTouchListener(){
+                            public boolean onTouch(View v, MotionEvent event) {
+                                // TODO Auto-generated method stub
+                                return false;
+                            }
+                        });
+
+                        sencondBoldTypeSpinner.setOnFocusChangeListener(new Spinner.OnFocusChangeListener(){
+                            public void onFocusChange(View v, boolean hasFocus) {
+                                // TODO Auto-generated method stub
+
+                            }
+                        });
+                        ////////////////////
+                        Cursor thirdCur = m_MyDatabaseAdapter.getGongweiCount("'" + gPartCode + "'", "'" + gVinCode + "'");
+                        int gongweiCount = 0;
+                        final List<String> listBoltNumList = new ArrayList<String>();
+                        if (thirdCur != null) {
+                            if (thirdCur.moveToFirst()) {
+                                do {
+                                    listBoltNumList.add(thirdCur.getString(0));
+                                    gongweiCount++;
+                                } while (thirdCur.moveToNext());
+                            }
+                            thirdCur.close();
+                        }
+                        for(int i = 0; i < gongweiCount; i++) {
                             final LinearLayout luosiLayout = (LinearLayout) layoutInflater.inflate(R.layout.test_torque_wrench, null);
                             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
                             lp.setMargins(0, 0,
@@ -332,6 +389,59 @@ public class ScanChassisActivity extends Activity {
                             luosiLayout.setLayoutParams(lp);
                             luosiLayout.setTag(i);
                             thirdStepLiearlayout.addView(luosiLayout);
+                            TextView gongweiNameTextView  = (TextView)luosiLayout.findViewById(R.id.gongweimingchengtextview);
+                            //首次进入开始填写数据有则填没有则不填
+                            Cursor testCorqueDataCur = m_MyDatabaseAdapter.getTestDataForGongwei("'" + listBoltNumList.get(i) + "'",
+                                    "'" + gPartCode + "'", "'" + gVinCode + "'");
+                            if (testCorqueDataCur != null) {
+                                if (testCorqueDataCur.moveToFirst()) {
+                                    do {
+                                        String testTorque = testCorqueDataCur.getString(0);
+                                        String testTime = testCorqueDataCur.getString(1);
+                                        String testResult = testCorqueDataCur.getString(2);
+                                        String correctedTorque = testCorqueDataCur.getString(3);
+                                        String correctedTime = testCorqueDataCur.getString(4);
+                                        String correctedResult = testCorqueDataCur.getString(5);
+
+                                        EditText shoujianTorqueEdit = (EditText)luosiLayout.findViewById(R.id.shoucetextedit);
+                                        shoujianTorqueEdit.setText(testTorque);
+                                        EditText shoujianTorqueTimeEdit = (EditText)luosiLayout.findViewById(R.id.shoucetimetextedit);
+                                        shoujianTorqueTimeEdit.setText(testTime);
+                                        CheckBox shoujianCheckBox = (CheckBox)luosiLayout.findViewById(R.id.shoucecheckbox);
+                                        shoujianCheckBox.setChecked(true);
+                                        TextView shoujianResultTextView = (TextView)luosiLayout.findViewById(R.id.shouceresult);
+                                        if(testResult.equals("0")) {
+                                            shoujianResultTextView.setText("合格");
+                                        }
+                                        else if(testResult.equals("1")) {
+                                            shoujianResultTextView.setText("超下限");
+                                        }
+                                        else if(testResult.equals("2")) {
+                                            shoujianResultTextView.setText("超上限");
+                                        }
+
+                                        EditText xiuzhengTorqueEdit = (EditText)luosiLayout.findViewById(R.id.xiuzhengtextedit);
+                                        xiuzhengTorqueEdit.setText(correctedTorque);
+                                        EditText xiuzhengTorqueTimeEdit = (EditText)luosiLayout.findViewById(R.id.xiuzhengtimetextedit);
+                                        xiuzhengTorqueTimeEdit.setText(correctedTime);
+                                        CheckBox xiuzhengCheckBox = (CheckBox)luosiLayout.findViewById(R.id.xiuzhengcheckbox);
+                                        xiuzhengCheckBox.setChecked(true);
+                                        TextView xiuzhengResultTextView = (TextView)luosiLayout.findViewById(R.id.xiuzhengresult);
+                                        if(correctedResult.equals("0")) {
+                                            xiuzhengResultTextView.setText("合格");
+                                        }
+                                        else if(correctedResult.equals("1")) {
+                                            xiuzhengResultTextView.setText("超下限");
+                                        }
+                                        else if(correctedResult.equals("2")) {
+                                            xiuzhengResultTextView.setText("超上限");
+                                        }
+                                    } while (testCorqueDataCur.moveToNext());
+                                }
+                                testCorqueDataCur.close();
+                            }
+                            //
+                            gongweiNameTextView.setText(listBoltNumList.get(i));
                             ////
                             ImageButton gongweiButton = (ImageButton)luosiLayout.findViewById(R.id.luoshuanbutton);
                             gongweiButton.setOnClickListener(new View.OnClickListener() {
@@ -707,6 +817,7 @@ public class ScanChassisActivity extends Activity {
             resultDataStr1 = map.get("时间");
             resultDataStr2 = map.get("实测值");
             resultDataStr3 = map.get("结论");
+            resultDataStr4 = map.get("日期");
             Iterator<String> it = map.keySet().iterator();
             if(clickedIndex != -1) {
                 LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -715,27 +826,57 @@ public class ScanChassisActivity extends Activity {
                     if(i == clickedIndex) {
                         LinearLayout luosiLayout = (LinearLayout)thirdStepLiearlayout.getChildAt(i);
                         EditText shouceTextEdit = (EditText)luosiLayout.findViewById(R.id.shoucetextedit);
-                        shouceTextEdit.setText(resultDataStr2);
-
                         EditText shouceTimeTextEdit = (EditText)luosiLayout.findViewById(R.id.shoucetimetextedit);
-                        shouceTimeTextEdit.setText(resultDataStr1);
+                        CheckBox shouceCheckbox = (CheckBox)luosiLayout.findViewById(R.id.shoucecheckbox);
+                        TextView shouceResult = (TextView)luosiLayout.findViewById(R.id.shouceresult);
 
                         EditText xiuzhengTextEdit = (EditText)luosiLayout.findViewById(R.id.xiuzhengtextedit);
-                        xiuzhengTextEdit.setText(resultDataStr2);
-
                         EditText xiuzhengTimeTextEdit = (EditText)luosiLayout.findViewById(R.id.xiuzhengtimetextedit);
-                        xiuzhengTimeTextEdit.setText(resultDataStr1);
-
-                        CheckBox shouceCheckbox = (CheckBox)luosiLayout.findViewById(R.id.shoucecheckbox);
                         CheckBox xiuzhengCheckbox = (CheckBox)luosiLayout.findViewById(R.id.xiuzhengcheckbox);
-                        shouceCheckbox.setChecked(true);
-                        xiuzhengCheckbox.setChecked(true);
-
-                        TextView shouceResult = (TextView)luosiLayout.findViewById(R.id.shouceresult);
                         TextView xiuzhengResult = (TextView)luosiLayout.findViewById(R.id.xiuzhengresult);
-                        shouceResult.setText(resultDataStr3);
-                        xiuzhengResult.setText(resultDataStr3);
-                        //直接存到数据库
+
+                        TextView gongweiNameTextView = (TextView)luosiLayout.findViewById(R.id.gongweimingchengtextview);
+                        String gongweiName = gongweiNameTextView.getText().toString();
+                        if(shouceTextEdit.getText().toString().equals("")) {
+                            //首测为空直接插入表中首测数据
+                            shouceTextEdit.setText(resultDataStr2);
+                            shouceTimeTextEdit.setText(resultDataStr1);
+                            shouceCheckbox.setChecked(true);
+                            shouceResult.setText(resultDataStr3);
+                            String resultTest = "";
+                            if(resultDataStr3.equals("合格")) {
+                                resultTest = "0";
+                            }
+                            else if(resultDataStr3.equals("超下限")) {
+                                resultTest = "1";
+                            }
+                            else {
+                                resultTest = "2";
+                            }
+                            String resultTime = resultDataStr4 + " " + resultDataStr1;
+                            m_MyDatabaseAdapter.insertTestDataTableBlueTooth(gVinCode, gPartCode, gongweiName, resultTime,
+                                    resultDataStr2, resultTime, resultTest, "", "", "", Integer.toString(DataHolder.getUserId()));
+                        }
+                        else {
+                            //首测不为空，update表中数据，但是要update表中修正数据
+                            xiuzhengTextEdit.setText(resultDataStr2);
+                            xiuzhengTimeTextEdit.setText(resultDataStr1);
+                            xiuzhengCheckbox.setChecked(true);
+                            xiuzhengResult.setText(resultDataStr3);
+                            String resultTest = "";
+                            if(resultDataStr3.equals("合格")) {
+                                resultTest = "0";
+                            }
+                            else if(resultDataStr3.equals("超下限")) {
+                                resultTest = "1";
+                            }
+                            else {
+                                resultTest = "2";
+                            }
+                            String resultTime = resultDataStr4 + " " + resultDataStr1;
+                            m_MyDatabaseAdapter.updateTestDataTableBlueTooth(gVinCode, gPartCode, gongweiName, resultDataStr2,
+                                    resultTime, resultTest, resultTime);
+                        }
                     }
                 }
                 //移动到下一个

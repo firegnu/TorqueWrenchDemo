@@ -3,16 +3,9 @@ package com.example.firegnu.torquewrenchdemo;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.DatePickerDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -20,11 +13,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.CalendarView;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -150,12 +141,15 @@ public class ScanHistory extends Activity {
             if (cur.moveToFirst()) {
                 do {
                     String carMode = cur.getString(0);
-                    carMode = m_MyDatabaseAdapter.getCarModelFromVinCode(carMode);
+                    carMode = m_MyDatabaseAdapter.getCarModelFromVinCode("'" + carMode + "'");
                     String partCode = cur.getString(1);
-                    String partName = m_MyDatabaseAdapter.getPartNameFromPartNo(partCode);
+                    String partName = m_MyDatabaseAdapter.getPartNameFromPartNo("'" + partCode + "'");
                     String partStation = cur.getString(2);
                     String torque = cur.getString(3);
-                    String torqueTime = cur.getString(4);
+                    if(torque == null) {
+                        torque = "";
+                    }
+                    String torqueTime = cur.getString(4) + ":00";
                     //
                     SimpleDateFormat curFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     String resultStr = "";
@@ -170,17 +164,23 @@ public class ScanHistory extends Activity {
                     //
                     int torqueResult = cur.getInt(5);
                     String correcttedTorque = cur.getString(6);
-                    String correcttedTorqueTime = cur.getString(7);
+                    if(correcttedTorque.equals("null")) {
+                        correcttedTorque = "";
+                    }
+                    String correcttedTorqueTime = cur.getString(7) + ":00";
                     //
                     SimpleDateFormat curFormaterCorrecttedTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     String resultStrCorrecttedTime = "";
-                    try {
-                        Date dateObj = curFormaterCorrecttedTime.parse(correcttedTorqueTime);
-                        SimpleDateFormat curFormaterStrCorrecttedTime = new SimpleDateFormat("HH:mm");
-                        resultStrCorrecttedTime = curFormaterStrCorrecttedTime.format(dateObj);
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
+                    //if(correcttedTorqueTime.equals("")) {
+                        try {
+                            Date dateObj = curFormaterCorrecttedTime.parse(correcttedTorqueTime);
+                            SimpleDateFormat curFormaterStrCorrecttedTime = new SimpleDateFormat("HH:mm");
+                            resultStrCorrecttedTime = curFormaterStrCorrecttedTime.format(dateObj);
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    //}
+
                     //
                     int correcttedTorqueResult = cur.getInt(8);
                     String finalTorqueResult = "";

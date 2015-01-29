@@ -3,14 +3,16 @@ package com.example.firegnu.torquewrenchdemo;
 /**
  * Created by firegnu on 15-1-22.
  */
-import java.util.LinkedList;
-import java.util.List;
+
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
+
+import java.util.LinkedList;
+import java.util.List;
 
 
 public class ListViewTable extends LinearLayout {

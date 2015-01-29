@@ -32,9 +32,6 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.example.firegnu.torquewrenchdemo.Public;
-import com.example.firegnu.torquewrenchdemo.SampleGattAttributes;
-
 import java.util.List;
 import java.util.UUID;
 

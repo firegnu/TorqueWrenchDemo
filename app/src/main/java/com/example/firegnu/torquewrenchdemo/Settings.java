@@ -5,16 +5,12 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.TypedValue;
-import android.view.Display;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,8 +20,6 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -455,8 +449,8 @@ public class Settings extends Activity {
                     m_MyDatabaseAdapter.insertBomDataTable(id, vinCode, partCode, partStation,
                             model, partNo, boltType);
                 }
-                //testdata
-                JSONArray serverTestDataDataList = jsonObject.getJSONArray("serverTestData");
+                //testdata不能下载testdata
+                /*JSONArray serverTestDataDataList = jsonObject.getJSONArray("serverTestData");
                 for(int i = 0; i < serverTestDataDataList.length(); i++) {
                     JSONObject bomTestDataData = (JSONObject) serverTestDataDataList.get(i);
                     String id = bomTestDataData.getString("id");
@@ -474,7 +468,7 @@ public class Settings extends Activity {
                     m_MyDatabaseAdapter.insertTestDataTable(id, vinCode, partCode, partStation,
                             testDate, testTorque, testTime, testResult, correctedTorque,
                             correctedTime, correctedResult, userID);
-                }
+                }*/
             } catch (JSONException e) {
                 e.printStackTrace();
             }

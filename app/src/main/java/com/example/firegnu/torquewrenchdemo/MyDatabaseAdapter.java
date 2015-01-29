@@ -3,14 +3,14 @@ package com.example.firegnu.torquewrenchdemo;
 /**
  * Created by firegnu on 15-1-26.
  */
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+
+import java.io.IOException;
 
 /**
  *
@@ -96,7 +96,7 @@ public class MyDatabaseAdapter {
 
     //通过扫描底盘VIN码得到相关数据
     public String getInfoFromVinCode(String vinCode) {
-        Cursor cursor = mSqLiteDatabase.rawQuery("select model from " + T_BOMDATA + " where vinCode=" + vinCode, null);
+        Cursor cursor = mSqLiteDatabase.rawQuery("select distinct model from " + T_BOMDATA + " where vinCode=" + vinCode, null);
         if (cursor != null) {
             if (cursor.moveToFirst()) {
                 return cursor.getString(0);
@@ -107,14 +107,26 @@ public class MyDatabaseAdapter {
 
     //根据所属车辆型号查询其包含的零件名称
     public Cursor getPartListfromCarModel(String carModel) {
-        Cursor cur = mSqLiteDatabase.rawQuery("select partNo from " + T_BOMSTRUCT + " where model=" + carModel, null);
+        Cursor cur = mSqLiteDatabase.rawQuery("select distinct partName from " + T_BOMSTRUCT + " where model=" + carModel, null);
         return cur;
     }
 
     //根据扫描得到的零件号得到该零件的相关信息
-    public Cursor getPartInfoFromPartNo(String partNo) {
-        Cursor cursor = mSqLiteDatabase.rawQuery("select partName, boltType, boltNum, standardValue, valueRange, limitRange, workmanship from " + T_BOMSTRUCT + " where partNo=" + partNo, null);
-        return cursor;
+    public Cursor getPartInfoFromPartNo(String partCode, String vinCode, String model) {
+        //return cursor;
+        //String sqlStr = "select distinct partNo from " + T_BOMDATA + " where partCode = " + "'E52581-P001'" + " and vinCode = " +"'E52581'";
+        String sqlStr = "select distinct partNo from " + T_BOMDATA + " where partCode = " + partCode + " and vinCode = " +vinCode;
+        Cursor cur = mSqLiteDatabase.rawQuery(sqlStr, null);
+        String partNoCur = "";
+        if (cur != null) {
+            if (cur.moveToFirst()) {
+                partNoCur = cur.getString(0);
+            }
+        }
+        //String sqlStr1 = "select * from " + T_BOMSTRUCT + " where partNo = " + "'SF-lj-ZQ' " + "and model = " + "'J6P6*4'";
+        String sqlStr1 = "select * from " + T_BOMSTRUCT + " where partNo = " + "'" + partNoCur + "'" + " and model = " + model;
+        Cursor curSor = mSqLiteDatabase.rawQuery(sqlStr1, null);
+        return curSor;
     }
 
     //得到检测数据
@@ -147,7 +159,7 @@ public class MyDatabaseAdapter {
 
     //通过零件型号得到零件名称
     public String getPartNameFromPartNo(String partCode) {
-        String partNo = getPartNoFromCode(partCode);
+        String partNo = "'" + getPartNoFromCode(partCode) + "'";
         Cursor cursor = mSqLiteDatabase.rawQuery("select partName from " + T_BOMSTRUCT + " where partNo=" + partNo, null);
         if (cursor != null) {
             if (cursor.moveToFirst()) {
@@ -252,5 +264,55 @@ public class MyDatabaseAdapter {
         init.put("correctedResult", correctedResult);
         init.put("userID", userID);
         return mSqLiteDatabase.insert(T_TESTDATA, null, init);
+    }
+
+    public long insertTestDataTableBlueTooth(String vinCode, String partCode, String partStation,
+                                             String testDate, String testTorque, String testTime, String testResult, String correctedTorque,
+                                             String correctedTime, String correctedResult, String userID)
+    {
+        ContentValues init = new ContentValues();
+        init.put("vinCode", vinCode);
+        init.put("partCode", partCode);
+        init.put("partStation", partStation);
+        init.put("testDate", testDate);
+        init.put("testTorque", testTorque);
+        init.put("testTime", testTime);
+        init.put("testResult", testResult);
+        init.put("correctedTorque", correctedTorque);
+        init.put("correctedTime", correctedTime);
+        init.put("correctedResult", correctedResult);
+        init.put("userID", userID);
+        return mSqLiteDatabase.insert(T_TESTDATA, null, init);
+    }
+
+    public boolean updateTestDataTableBlueTooth(String vinCode, String partCode, String partStation,
+                                                String correctedTestDate, String correctedTestTorque, String correctedTestTime,
+                                                String resultTime) {
+        ContentValues con = new ContentValues();
+        con.put("testDate", resultTime);
+        con.put("correctedTorque", correctedTestDate);
+        con.put("correctedTime", correctedTestTorque);
+        con.put("correctedResult", correctedTestTime);
+        String sqlStr = "vinCode=" + "'" +vinCode + "'" + " and partCode = " + "'" +partCode + "'" + " and partStation = " + "'" +partStation + "'";
+        return mSqLiteDatabase.update(T_TESTDATA, con, sqlStr, null) > 0;
+
+    }
+
+
+
+    public Cursor getGongweiCount(String partCode, String vinCode) {
+        //select partStation, boltType from torquewrench.bomdata where partCode = 'E52581-P001' and vinCode = 'E52581';
+        //String sqlStr = "select partStation from " + T_BOMDATA + " where partCode = " + "'E52581-P001' and vinCode = " + "'E52581' " + "order by id";
+        String sqlStr = "select partStation from " + T_BOMDATA + " where partCode = " + partCode + " and vinCode = " + vinCode + " order by id";
+        Cursor cursor = mSqLiteDatabase.rawQuery(sqlStr, null);
+        return cursor;
+    }
+    //从testdata表中查找相关数据
+    public Cursor getTestDataForGongwei(String gongweiName, String partCode, String vinCode) {
+        String sqlStr = "select testTorque, testTime, testResult, correctedTorque, correctedTime, correctedResult from " +
+                T_TESTDATA + " where vinCode = " + vinCode + " and partCode = " + partCode + " and partStation = " + gongweiName;
+        Cursor cursor = mSqLiteDatabase.rawQuery(sqlStr, null);
+        return cursor;
+
     }
 }

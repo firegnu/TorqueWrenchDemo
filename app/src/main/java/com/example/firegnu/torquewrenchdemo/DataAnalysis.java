@@ -2,12 +2,12 @@ package com.example.firegnu.torquewrenchdemo;
 
 import java.text.DecimalFormat;
 import java.util.HashMap;
-import java.util.Iterator;
 /**
  * Created by firegnu on 15-1-29.
  */
 public class DataAnalysis {
-    static HashMap<String,String> map = new HashMap<String,String>();
+    static HashMap<String, String> map = new HashMap<String, String>();
+
     /*public static void main(String args[]){
         String ReceiveData = "01 08 9E 03 03 02 0F 09 0A 0E 23 07 D1 00 01";
         map = toData(ReceiveData);
@@ -17,7 +17,7 @@ public class DataAnalysis {
             System.out.print(key + ":" + map.get(key) + "\n");
         }
     }*/
-    public static HashMap<String, String> toData(String data){
+    public static HashMap<String, String> toData(String data) {
         map.clear();
         String array[] = data.split(" ");
         //预置值编号
@@ -46,9 +46,23 @@ public class DataAnalysis {
         else{
             year = "20" + yearNum;
         }
-        int month = Integer.valueOf(array[7],16);
-        int day = Integer.valueOf(array[8],16);
-        String date = year + "." + month + "." + day;
+        int monthNum = Integer.valueOf(array[7],16);
+        String month = null;
+        if(monthNum < 10){
+            month = "0" + monthNum;
+        }
+        else{
+            month = monthNum + "";
+        }
+        int dayNum = Integer.valueOf(array[8],16);
+        String day = null;
+        if(dayNum < 10){
+            day = "0" + dayNum;
+        }
+        else{
+            day = dayNum + "";
+        }
+        String date = year + "-" + month + "-" + day;
         map.put("日期", date);
         //时间
         int hour = Integer.valueOf(array[9],16);
@@ -58,7 +72,7 @@ public class DataAnalysis {
         }
         int minute = Integer.valueOf(array[10],16);
         String Minute = minute + "";
-        if(hour < 10){
+        if(minute < 10){
             Minute = "0" + minute;
         }
         String time = Hour + ":" + Minute;
@@ -128,10 +142,10 @@ public class DataAnalysis {
         String result = null;
         if(error > precision || error < -precision){
             if(Float.parseFloat(d_value_s) > 0){
-                result = "正超差";
+                result = "超上限";
             }
             else{
-                result = "负超差";
+                result = "超下限";
             }
         }
         else{

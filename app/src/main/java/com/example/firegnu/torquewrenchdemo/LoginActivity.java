@@ -6,29 +6,15 @@ import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothGattCharacteristic;
-import android.bluetooth.BluetoothGattService;
-import android.bluetooth.BluetoothManager;
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.IBinder;
-import android.provider.ContactsContract;
-import android.util.*;
-import android.util.Log;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -37,12 +23,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ExpandableListView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.SimpleExpandableListAdapter;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -76,7 +59,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 
@@ -613,7 +595,7 @@ public class LoginActivity extends Activity {
                             model, partNo, boltType);
                 }
                 //testdata
-                JSONArray serverTestDataDataList = jsonObject.getJSONArray("serverTestData");
+                /*JSONArray serverTestDataDataList = jsonObject.getJSONArray("serverTestData");
                 for(int i = 0; i < serverTestDataDataList.length(); i++) {
                     JSONObject bomTestDataData = (JSONObject) serverTestDataDataList.get(i);
                     String id = bomTestDataData.getString("id");
@@ -631,7 +613,7 @@ public class LoginActivity extends Activity {
                     m_MyDatabaseAdapter.insertTestDataTable(id, vinCode, partCode, partStation,
                             testDate, testTorque, testTime, testResult, correctedTorque,
                             correctedTime, correctedResult, userID);
-                }
+                }*/
             } catch (JSONException e) {
                 e.printStackTrace();
             }

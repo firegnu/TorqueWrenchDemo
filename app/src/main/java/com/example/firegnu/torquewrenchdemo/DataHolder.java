@@ -1,8 +1,5 @@
 package com.example.firegnu.torquewrenchdemo;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /**
  * Created by firegnu on 15-1-26.
  */

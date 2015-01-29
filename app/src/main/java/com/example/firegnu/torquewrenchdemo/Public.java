@@ -1,7 +1,5 @@
 package com.example.firegnu.torquewrenchdemo;
 
-import java.util.Calendar;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -10,6 +8,8 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.util.Log;
+
+import java.util.Calendar;
 
 public class Public {
     public static boolean  b_ascii_mode = false;
