@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -15,11 +16,15 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -58,9 +63,12 @@ import java.util.List;
 
 
 public class Settings extends Activity {
-
+    final Context context = this;
     MyDatabaseAdapter m_MyDatabaseAdapter;
     private View mProgressView;
+    private List<Integer> idList = new ArrayList<Integer>();
+    private List<String> nameList = new ArrayList<String>();
+    private String newPassword = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,8 +80,9 @@ public class Settings extends Activity {
 
         final ActionBar actionBar = getActionBar();
         setHasEmbeddedTabs(actionBar,false);
-        setTitle("扭矩扳手工作正常");
-        getActionBar().setIcon(R.drawable.userlogo);
+        setTitle(DataHolder.getUserName());
+        actionBar.setDisplayShowHomeEnabled(false);
+        //getActionBar().setIcon(R.drawable.userlogo);
 
         Button logoutButton = (Button) findViewById(R.id.logoutbutton);
         logoutButton.setOnClickListener(new View.OnClickListener() {
@@ -103,14 +112,71 @@ public class Settings extends Activity {
         int userType = DataHolder.getUserType();
 
         //normal user
-        EditText saveGroupEdit = (EditText)findViewById(R.id.savegroupedit);
+        /*EditText saveGroupEdit = (EditText)findViewById(R.id.savegroupedit);
         ImageButton saveGroupButton = (ImageButton)findViewById(R.id.savegroupbutton);
         saveGroupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 saveGroup();
             }
+        });*/
+        Cursor cur = m_MyDatabaseAdapter.getAllGroupInfo();
+        if (cur != null) {
+            if (cur.moveToFirst()) {
+                do {
+                    int id = cur.getInt(0);
+                    String name = cur.getString(1);
+                    idList.add(id);
+                    nameList.add(name);
+                } while (cur.moveToNext());
+            }
+            cur.close();
+        }
+        ////////////////
+        SharedPreferences settingsGroupName = getApplicationContext().getSharedPreferences("groupId", 0);
+        int definedGroupId = 0;
+        final int groupIdSelected = settingsGroupName.getInt("groupId", definedGroupId);
+        Spinner groupSpinner = (Spinner)findViewById(R.id.spinnergroup);
+
+        final ArrayAdapter<String> adapterBoltType = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, nameList);
+        adapterBoltType.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        groupSpinner.setAdapter(adapterBoltType);
+        groupSpinner.setSelection(groupIdSelected);
+        groupSpinner.setOnItemSelectedListener(new Spinner.OnItemSelectedListener(){
+            public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+                //首先保存到SharedPreferences中
+                SharedPreferences groupId = getApplicationContext().getSharedPreferences("groupId", 0);
+                SharedPreferences.Editor editorBanshouName = groupId.edit();
+                editorBanshouName.putInt("groupId", arg2);
+                editorBanshouName.apply();
+                if(arg2 != groupIdSelected) {
+                    //String selectedPerson = adapterBoltType.getItem(arg2);
+                    logout();
+                }
+
+                arg0.setVisibility(View.VISIBLE);
+            }
+            public void onNothingSelected(AdapterView<?> arg0) {
+                // TODO Auto-generated method stub
+                //selectedPerson = "";
+                arg0.setVisibility(View.VISIBLE);
+            }
         });
+
+        groupSpinner.setOnTouchListener(new Spinner.OnTouchListener(){
+            public boolean onTouch(View v, MotionEvent event) {
+                // TODO Auto-generated method stub
+                return false;
+            }
+        });
+
+        groupSpinner.setOnFocusChangeListener(new Spinner.OnFocusChangeListener(){
+            public void onFocusChange(View v, boolean hasFocus) {
+                // TODO Auto-generated method stub
+
+            }
+        });
+        ////////////////////
 
         EditText saveBanshouEdit = (EditText)findViewById(R.id.savebanshouidedit);
         ImageButton saveBanshouButton = (ImageButton)findViewById(R.id.savebanshouidbutton);
@@ -147,8 +213,9 @@ public class Settings extends Activity {
             }
         });
         if(userType == 1) {
-            saveGroupEdit.setEnabled(false);
-            saveGroupButton.setEnabled(false);
+            //saveGroupEdit.setEnabled(false);
+            //saveGroupButton.setEnabled(false);
+            groupSpinner.setEnabled(false);
             saveBanshouEdit.setEnabled(false);
             saveBanshouButton.setEnabled(false);
             banshouWatchTimeEdit.setEnabled(false);
@@ -158,8 +225,9 @@ public class Settings extends Activity {
             autoRefreshDataSwitch.setEnabled(false);
         }
         else {
-            saveGroupEdit.setEnabled(true);
-            saveGroupButton.setEnabled(true);
+            //saveGroupEdit.setEnabled(true);
+            //saveGroupButton.setEnabled(true);
+            groupSpinner.setEnabled(true);
             saveBanshouEdit.setEnabled(true);
             saveBanshouButton.setEnabled(true);
             banshouWatchTimeEdit.setEnabled(true);
@@ -169,9 +237,8 @@ public class Settings extends Activity {
             autoRefreshDataSwitch.setEnabled(true);
         }
         //get sharedPreferences data
-        SharedPreferences settingsGroupName = getApplicationContext().getSharedPreferences("groupName", 0);
-        String groupName = settingsGroupName.getString("groupName", "");
-        saveGroupEdit.setText(groupName);
+
+        ////saveGroupEdit.setText(groupName);
 
         SharedPreferences settingsBanshouName = getApplicationContext().getSharedPreferences("banshouName", 0);
         String banshouName = settingsBanshouName.getString("banshouName", "");
@@ -394,8 +461,10 @@ public class Settings extends Activity {
         protected void onPostExecute(String[] result) {
             //3.将得到的远程服务中的数据填充如本地数据库
             JSONObject jsonObject = null;
+            boolean bUpdate = false;
             try {
                 jsonObject = new JSONObject(serverData);
+                bUpdate = true;
                 //group
                 JSONArray serverGroupDataList = jsonObject.getJSONArray("serverGroupData");
                 //2.next把本地数据全部清空
@@ -474,30 +543,46 @@ public class Settings extends Activity {
             }
             //4.退出当前账号，重新登陆
             showProgress(false);
-            SharedPreferences lastAsyncTime = getApplicationContext().getSharedPreferences("lastAsyncTime", 0);
-            SharedPreferences.Editor editorlastAsyncTime = lastAsyncTime.edit();
-            Calendar currentDate = Calendar.getInstance();
-            Date todayDate = currentDate.getTime();
-            SimpleDateFormat curCommentFormaterStr = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String resultCommentStr = "";
-            resultCommentStr = curCommentFormaterStr.format(todayDate);
-            editorlastAsyncTime.putString("lastAsyncTime", resultCommentStr);
-            editorlastAsyncTime.apply();
-            TextView lastSyncTimeTextView = (TextView)findViewById(R.id.lastsynctimetextview);
-            lastSyncTimeTextView.setText("上次同步数据时间：" + resultCommentStr);
-            Switch syncSwitch = (Switch)findViewById(R.id.syncstausswitch);
-            syncSwitch.setChecked(false);
-            logout();
+            if(bUpdate) {
+                SharedPreferences lastAsyncTime = getApplicationContext().getSharedPreferences("lastAsyncTime", 0);
+                SharedPreferences.Editor editorlastAsyncTime = lastAsyncTime.edit();
+                Calendar currentDate = Calendar.getInstance();
+                Date todayDate = currentDate.getTime();
+                SimpleDateFormat curCommentFormaterStr = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String resultCommentStr = "";
+                resultCommentStr = curCommentFormaterStr.format(todayDate);
+                editorlastAsyncTime.putString("lastAsyncTime", resultCommentStr);
+                editorlastAsyncTime.apply();
+                TextView lastSyncTimeTextView = (TextView)findViewById(R.id.lastsynctimetextview);
+                lastSyncTimeTextView.setText("上次同步数据时间：" + resultCommentStr);
+                Switch syncSwitch = (Switch)findViewById(R.id.syncstausswitch);
+                syncSwitch.setChecked(false);
+                logout();
+            }
+
             super.onPostExecute(result);
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        int testDataCount = m_MyDatabaseAdapter.getTestDateCount();
+        Switch syncSwitch = (Switch)findViewById(R.id.syncstausswitch);
+        if(testDataCount == 0) {
+            syncSwitch.setChecked(false);
+        }
+        else {
+            syncSwitch.setChecked(true);
+        }
+    }
+
     public void saveGroup() {
-        EditText saveGroupEdit = (EditText)findViewById(R.id.savegroupedit);
+        /*EditText saveGroupEdit = (EditText)findViewById(R.id.savegroupedit);
         SharedPreferences groupName = getApplicationContext().getSharedPreferences("groupName", 0);
         SharedPreferences.Editor editorGroupName = groupName.edit();
         editorGroupName.putString("groupName", saveGroupEdit.getText().toString());
-        editorGroupName.apply();
+        editorGroupName.apply();*/
     }
 
     public void saveBanshouId() {
@@ -530,13 +615,58 @@ public class Settings extends Activity {
         editorDataWatchTime.putBoolean("bAutoRefresh", bChecked);
         editorDataWatchTime.apply();
     }
+    //////////////////////////////////////////////////////////////////////////////
+    private class ModifyServerPassword extends AsyncTask<Void, Void, String[]> {
 
+        public void postData() {
+            // Create a new HttpClient and Post Header
+            String uri = DataHolder.getServerAddress() + "/mobile/modifyUserPassword/";
+            HttpParams httpParams = new BasicHttpParams();
+            httpParams.setParameter("charset", "UTF-8");
+            HttpClient httpclient = new DefaultHttpClient(httpParams);
+            HttpPost httppost = new HttpPost(uri);
+            httppost.addHeader("charset", HTTP.UTF_8);
+            try {
+                  List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
+                  nameValuePairs.add(new BasicNameValuePair("userId", Integer.toString(DataHolder.getUserId())));
+                  nameValuePairs.add(new BasicNameValuePair("newPassword", newPassword));
+
+                  httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs, "UTF-8"));
+                    // Execute HTTP Post Request
+                  HttpResponse response = httpclient.execute(httppost);
+
+                  HttpEntity entity = response.getEntity();
+                  String line = EntityUtils.toString(entity);
+                  System.out.println(line);
+
+            } catch (ClientProtocolException e) {
+                // TODO Auto-generated catch block
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+            }
+        }
+
+        @Override
+        protected String[] doInBackground(Void... params) {
+            postData();
+            return null;
+        }
+
+        protected void onPostExecute(String[] result) {
+            Toast toast = Toast.makeText(getApplicationContext(),
+                    "密码修改成功", Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
+            super.onPostExecute(result);
+        }
+    }
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
     public void modifyUserPassword() {
         EditText oldPasswordEdit = (EditText)findViewById(R.id.settingsoldpassword);
         EditText newPasswordEdit = (EditText)findViewById(R.id.settingsnewpassword);
         EditText reNewPasswordEdit = (EditText)findViewById(R.id.settingsrenewpassword);
         String oldPassword = oldPasswordEdit.getText().toString();
-        String newPassword = newPasswordEdit.getText().toString();
+        newPassword = newPasswordEdit.getText().toString();
         String reNewPassword = reNewPasswordEdit.getText().toString();
         if(!oldPassword.equals(DataHolder.getUserPassword())) {
             Toast toast = Toast.makeText(getApplicationContext(),
@@ -550,14 +680,17 @@ public class Settings extends Activity {
             toast.setGravity(Gravity.CENTER, 0, 0);
             toast.show();
         }
+        else if(newPassword.equals("")) {
+            Toast toast = Toast.makeText(getApplicationContext(),
+                    "密码不能为空", Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
+        }
         else{
             //modify user password
             Boolean bModifyUserPassword = m_MyDatabaseAdapter.updateUserPassword(newPassword, DataHolder.getUserId());
             if(bModifyUserPassword) {
-                Toast toast = Toast.makeText(getApplicationContext(),
-                        "密码修改成功", Toast.LENGTH_LONG);
-                toast.setGravity(Gravity.CENTER, 0, 0);
-                toast.show();
+                new ModifyServerPassword().execute();
             }
             else {
                 Toast toast = Toast.makeText(getApplicationContext(),

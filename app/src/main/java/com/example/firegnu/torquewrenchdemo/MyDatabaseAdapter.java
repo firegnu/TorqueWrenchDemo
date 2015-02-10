@@ -82,8 +82,19 @@ public class MyDatabaseAdapter {
     }
 
     //get all users infomations
+    public Cursor getAllUsersGroupInfo(int groupId) {
+        Cursor cursor = mSqLiteDatabase.rawQuery("select * from " + T_USER + " where groupID=" + groupId, null);
+        return cursor;
+    }
+
     public Cursor getAllUsersInfo() {
         Cursor cursor = mSqLiteDatabase.rawQuery("select * from " + T_USER, null);
+        return cursor;
+    }
+
+    //get all group information
+    public Cursor getAllGroupInfo() {
+        Cursor cursor = mSqLiteDatabase.rawQuery("select * from " + T_GROUP, null);
         return cursor;
     }
 
@@ -315,4 +326,16 @@ public class MyDatabaseAdapter {
         return cursor;
 
     }
+
+    public int getTestDateCount() {
+        Cursor cursor = mSqLiteDatabase.rawQuery("select count(*) from " + T_TESTDATA, null);
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                return cursor.getInt(0);
+            }
+        }
+        return 0;
+    }
+
+
 }

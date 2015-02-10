@@ -164,6 +164,17 @@ public class LoginActivity extends Activity {
         parms.gravity = Gravity.CENTER;
         view.setLayoutParams(parms);
 
+        SharedPreferences settingsGroupName = getApplicationContext().getSharedPreferences("groupId", 0);
+        int definedGroupId = 0;
+        int groupIdSelected = settingsGroupName.getInt("groupId", definedGroupId);
+        //初次进入默认选择第一组
+        if(groupIdSelected == 0) {
+            SharedPreferences groupId = getApplicationContext().getSharedPreferences("groupId", 0);
+            SharedPreferences.Editor editorBanshouName = groupId.edit();
+            editorBanshouName.putInt("groupId", 0);
+            editorBanshouName.apply();
+        }
+        //
         cur = m_MyDatabaseAdapter.getAllUsersInfo();
         if (cur != null) {
             if (cur.moveToFirst()) {
@@ -174,12 +185,14 @@ public class LoginActivity extends Activity {
                     String password = cur.getString(3);
                     int type = cur.getInt(4);
                     int groupID = cur.getInt(5);
-                    idList.add(id);
-                    nameList.add(name);
-                    photoList.add(photo);
-                    passwordList.add(password);
-                    typeList.add(type);
-                    groupIdList.add(groupID);
+                    if(groupID == (groupIdSelected + 1)) {
+                        idList.add(id);
+                        nameList.add(name);
+                        photoList.add(photo);
+                        passwordList.add(password);
+                        typeList.add(type);
+                        groupIdList.add(groupID);
+                    }
                 } while (cur.moveToNext());
             }
             cur.close();
@@ -191,7 +204,7 @@ public class LoginActivity extends Activity {
         publisherPhotoView = (ImageView)findViewById(R.id.userlogo);
         if (nameList.size() == 0) {
             userNameTextView.setText("数据库为空");
-            loginButton.setEnabled(false);
+            //loginButton.setEnabled(false);
             updateEmptyDatabase();
         } else {
             userNameTextView.setText(nameList.get(userIndex).toString());
@@ -199,8 +212,12 @@ public class LoginActivity extends Activity {
                 Picasso.with(this).load("http://" + DataHolder.getServerAddress() + photoList.get(userIndex).toString()).into(publisherPhotoView);
             }
         }
-        //auto connect to bluetooth device
-
+        //
+        SharedPreferences settingsLastSyncTime = getApplicationContext().getSharedPreferences("lastAsyncTime", 0);
+        String lastSyncTime = settingsLastSyncTime.getString("lastAsyncTime", "");
+        if(lastSyncTime.equals("")) {
+            loginButton.setText("与服务器同步数据");
+        }
     }
 
     //set default value
@@ -276,11 +293,40 @@ public class LoginActivity extends Activity {
     }
 
     public void attempLogin() {
-        EditText passwordText = (EditText) findViewById(R.id.password);
-        String password = passwordText.getText().toString();
 
-        if (password.equals(passwordList.get(userIndex))) {
-            SharedPreferences settings = getApplicationContext().getSharedPreferences("serveraddress", 0);
+        SharedPreferences settings = getApplicationContext().getSharedPreferences("serveraddress", 0);
+        String serverAddress = settings.getString("serveraddress", "");
+
+        SharedPreferences settingsLastSyncTime = getApplicationContext().getSharedPreferences("lastAsyncTime", 0);
+        String lastSyncTime = settingsLastSyncTime.getString("lastAsyncTime", "");
+        boolean bSyncing = false;
+        if(serverAddress.equals("")) {
+            Toast toast = Toast.makeText(getApplicationContext(),
+                    "服务器地址不能为空", Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
+            bSyncing = true;
+        }
+        else {
+            if(lastSyncTime.equals("")) {
+                DataHolder.setServerAddress("http://" + serverAddress);
+                showProgress(true);
+                asyncDataFromServer();
+                bSyncing = true;
+            }
+        }
+
+        if(!bSyncing) {
+            EditText passwordText = (EditText) findViewById(R.id.password);
+            String password = passwordText.getText().toString();
+
+            if (password.equals(passwordList.get(userIndex))) {
+                DataHolder.setServerAddress("http://" + serverAddress);
+                DataHolder.setUserName(nameList.get(userIndex));
+                DataHolder.setUserId(idList.get(userIndex));
+                DataHolder.setUserPassword(password);
+                DataHolder.setUserType(typeList.get(userIndex));
+            /*SharedPreferences settings = getApplicationContext().getSharedPreferences("serveraddress", 0);
             String serverAddress = settings.getString("serveraddress", "");
             if(serverAddress.equals("")) {
                 Toast toast = Toast.makeText(getApplicationContext(),
@@ -288,21 +334,21 @@ public class LoginActivity extends Activity {
                 toast.setGravity(Gravity.CENTER, 0, 0);
                 toast.show();
             }
-            else {
+            //else {
                 DataHolder.setServerAddress("http://" + serverAddress);
                 DataHolder.setUserName(nameList.get(userIndex));
                 DataHolder.setUserId(idList.get(userIndex));
                 DataHolder.setUserPassword(password);
                 DataHolder.setUserType(typeList.get(userIndex));
                 //need sync from server
-                SharedPreferences settingsLastSyncTime = getApplicationContext().getSharedPreferences("lastAsyncTime", 0);
+                /*SharedPreferences settingsLastSyncTime = getApplicationContext().getSharedPreferences("lastAsyncTime", 0);
                 String lastSyncTime = settingsLastSyncTime.getString("lastAsyncTime", "");
                 if(lastSyncTime.equals("")) {
                     showProgress(true);
                     asyncDataFromServer();
-                }
+                }*/
                 ////////////////////////////////////////////
-                else {
+                if(!lastSyncTime.equals("")) {
                     SharedPreferences settingsAutoRefresh = getApplicationContext().getSharedPreferences("bAutoRefresh", 0);
                     Boolean bDataRefresh = settingsAutoRefresh.getBoolean("bAutoRefresh", false);
 
@@ -320,14 +366,16 @@ public class LoginActivity extends Activity {
                     }
                 }
 
-            }
+                //}
 
-        } else {
-            Toast toast = Toast.makeText(getApplicationContext(),
-                    "密码错误", Toast.LENGTH_LONG);
-            toast.setGravity(Gravity.CENTER, 0, 0);
-            toast.show();
+            } else {
+                Toast toast = Toast.makeText(getApplicationContext(),
+                        "密码错误", Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
+            }
         }
+
     }
 
 
@@ -539,8 +587,10 @@ public class LoginActivity extends Activity {
         protected void onPostExecute(String[] result) {
             //3.将得到的远程服务中的数据填充如本地数据库
             JSONObject jsonObject = null;
+            boolean bUpdate = false;
             try {
                 jsonObject = new JSONObject(serverData);
+                bUpdate = true;
                 //group
                 JSONArray serverGroupDataList = jsonObject.getJSONArray("serverGroupData");
                 //2.next把本地数据全部清空
@@ -619,20 +669,28 @@ public class LoginActivity extends Activity {
             }
 
             showProgress(false);
-            SharedPreferences lastAsyncTime = getApplicationContext().getSharedPreferences("lastAsyncTime", 0);
-            SharedPreferences.Editor editorlastAsyncTime = lastAsyncTime.edit();
-            Calendar currentDate = Calendar.getInstance();
-            Date todayDate = currentDate.getTime();
-            SimpleDateFormat curCommentFormaterStr = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String resultCommentStr = "";
-            resultCommentStr = curCommentFormaterStr.format(todayDate);
-            editorlastAsyncTime.putString("lastAsyncTime", resultCommentStr);
-            editorlastAsyncTime.apply();
+            if(bUpdate) {
+                SharedPreferences lastAsyncTime = getApplicationContext().getSharedPreferences("lastAsyncTime", 0);
+                SharedPreferences.Editor editorlastAsyncTime = lastAsyncTime.edit();
+                Calendar currentDate = Calendar.getInstance();
+                Date todayDate = currentDate.getTime();
+                SimpleDateFormat curCommentFormaterStr = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String resultCommentStr = "";
+                resultCommentStr = curCommentFormaterStr.format(todayDate);
+                editorlastAsyncTime.putString("lastAsyncTime", resultCommentStr);
+                editorlastAsyncTime.apply();
 
             /*Intent intent = new Intent(LoginActivity.this, ScanChassisActivity.class);
             startActivity(intent);
             finish();*/
-            logout();
+                logout();
+            }
+            else {
+                Toast toast = Toast.makeText(getApplicationContext(),
+                        "与服务器同步失败", Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
+            }
 
             super.onPostExecute(result);
         }

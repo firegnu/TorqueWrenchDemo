@@ -8,10 +8,11 @@
     <uses-permission android:name="android.permission.BLUETOOTH"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
     <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@drawable/wrench"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
@@ -31,7 +32,8 @@
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/title_activity_scan_chassis"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden" >
+            android:windowSoftInputMode="stateHidden"
+            android:launchMode="singleTask">
         </activity>
         <activity
             android:name=".Settings"

@@ -66,6 +66,7 @@ public class ListViewTable extends LinearLayout {
                     for( int span = 0; span < params.span; span++ ) {
                         params.width += colWidths.get( cellnum + span );
                     }
+                    cell.setLayoutParams(params);
                 }
             }
         }

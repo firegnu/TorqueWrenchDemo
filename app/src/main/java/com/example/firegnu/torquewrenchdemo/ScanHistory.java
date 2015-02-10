@@ -1,10 +1,17 @@
 package com.example.firegnu.torquewrenchdemo;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,13 +24,28 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -55,6 +77,7 @@ public class ScanHistory extends Activity {
     private Spinner spinnerName;
     private ArrayAdapter<String> adapterName;
     private String selectedName = "";
+    private View mProgressView;
 
     private List<TableCellView> testResultList = new ArrayList<TableCellView>();
 
@@ -131,11 +154,13 @@ public class ScanHistory extends Activity {
 
         final ActionBar actionBar = getActionBar();
         setHasEmbeddedTabs(actionBar,false);
-        setTitle("扭矩扳手工作正常");
-        getActionBar().setIcon(R.drawable.userlogo);
+        setTitle(DataHolder.getUserName());
+        actionBar.setDisplayShowHomeEnabled(false);
+        //getActionBar().setIcon(R.drawable.userlogo);
         //get test result
         final ImageButton filterButton = (ImageButton) findViewById(R.id.filterbutton);
-        Cursor cur = m_MyDatabaseAdapter.getTestResult();
+        mProgressView = findViewById(R.id.login_progress);
+        /*Cursor cur = m_MyDatabaseAdapter.getTestResult();
 
         if (cur != null) {
             if (cur.moveToFirst()) {
@@ -171,7 +196,7 @@ public class ScanHistory extends Activity {
                     //
                     SimpleDateFormat curFormaterCorrecttedTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     String resultStrCorrecttedTime = "";
-                    //if(correcttedTorqueTime.equals("")) {
+                    //if(!cur.getString(7).equals("")) {
                         try {
                             Date dateObj = curFormaterCorrecttedTime.parse(correcttedTorqueTime);
                             SimpleDateFormat curFormaterStrCorrecttedTime = new SimpleDateFormat("HH:mm");
@@ -240,7 +265,7 @@ public class ScanHistory extends Activity {
                 table_row.addView(table_row_text);
             }
             bodyTable.addView(table_row);
-        }
+        }*/
 
 
         Calendar mycalendar=Calendar.getInstance(Locale.CHINA);
@@ -261,9 +286,30 @@ public class ScanHistory extends Activity {
         });
         showDate = (EditText)findViewById(R.id.showdatetext);
         //////////////////////
-        list.add(DataHolder.getUserName());
+        if(DataHolder.getUserType() == 1) {
+            list.add(DataHolder.getUserName());
+        }
+        else {
+            //添加当前组的所有用户
+            SharedPreferences settingsGroupName = getApplicationContext().getSharedPreferences("groupId", 0);
+            int definedGroupId = 0;
+            int groupIdSelected = settingsGroupName.getInt("groupId", definedGroupId);
+            Cursor cur = m_MyDatabaseAdapter.getAllUsersInfo();
+            if (cur != null) {
+                if (cur.moveToFirst()) {
+                    do {
+                        String name = cur.getString(1);
+                        int groupID = cur.getInt(5);
+                        if(groupID == (groupIdSelected + 1)) {
+                            list.add(name);
+                        }
+                    } while (cur.moveToNext());
+                }
+                cur.close();
+            }
+        }
         //if currentuser is superuser
-        if(DataHolder.getUserType() == 0) {
+        /*if(DataHolder.getUserType() == 0) {
             for (int inx = 0; inx < testResultList.size(); inx ++) {
                 TableCellView cellView = testResultList.get(inx);
                 String userName = m_MyDatabaseAdapter.getUserNameFromUserId(Integer.parseInt(cellView.getAt(9)));
@@ -271,7 +317,7 @@ public class ScanHistory extends Activity {
                     list.add(userName);
                 }
             }
-        }
+        }*/
 
         //////////////////////
         spinnerPerson = (Spinner)findViewById(R.id.spinnerperson);
@@ -323,7 +369,7 @@ public class ScanHistory extends Activity {
             public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
                 selectedPara = adapterPara.getItem(arg2);
                 arg0.setVisibility(View.VISIBLE);
-                filterButton.performClick();
+                //filterButton.performClick();
             }
             public void onNothingSelected(AdapterView<?> arg0) {
                 // TODO Auto-generated method stub
@@ -363,7 +409,7 @@ public class ScanHistory extends Activity {
             public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
                 selectedName = adapterName.getItem(arg2);
                 arg0.setVisibility(View.VISIBLE);
-                filterButton.performClick();
+                //filterButton.performClick();
             }
             public void onNothingSelected(AdapterView<?> arg0) {
                 // TODO Auto-generated method stub
@@ -395,6 +441,189 @@ public class ScanHistory extends Activity {
 
     }
 
+    public class DownloadDataTask extends AsyncTask<Void, Void, String[]> {
+        String serverData = "";
+        @Override
+        protected String[] doInBackground(Void... params) {
+            BufferedReader in = null;
+            try {
+                HttpClient client = new DefaultHttpClient();
+                HttpGet request = new HttpGet();
+                String uri = DataHolder.getServerAddress() + "/mobile/getHistoryServerTestData";
+                request.setURI(new URI(uri));
+                HttpResponse response = client.execute(request);
+                in = new BufferedReader
+                        (new InputStreamReader(response.getEntity().getContent()));
+                StringBuffer sb = new StringBuffer("");
+                String line = "";
+                String NL = System.getProperty("line.separator");
+                while ((line = in.readLine()) != null) {
+                    sb.append(line + NL);
+                }
+                in.close();
+                String page = sb.toString();
+                System.out.println(page);
+                serverData = page;
+                //
+            } catch (ClientProtocolException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            } finally {
+                if (in != null) {
+                    try {
+                        in.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            return null;
+        }
+
+        protected void onPostExecute(String[] result) {
+            //3.将得到的远程服务中的数据填充如本地数据库
+            JSONObject jsonObject = null;
+            boolean bUpdate = false;
+            try {
+                jsonObject = new JSONObject(serverData);
+                bUpdate = true;
+                //testdata
+                JSONArray serverTestDataDataList = jsonObject.getJSONArray("serverTestData");
+                for(int i = 0; i < serverTestDataDataList.length(); i++) {
+                    JSONObject bomTestDataData = (JSONObject) serverTestDataDataList.get(i);
+                    String id = bomTestDataData.getString("id");
+                    String vinCode = bomTestDataData.getString("vinCode");
+                    String partCode = bomTestDataData.getString("partCode");
+                    String partStation = bomTestDataData.getString("partStation");
+                    String testDate = bomTestDataData.getString("testDate");
+                    String testTorque = bomTestDataData.getString("testTorque");
+                    String testTime = bomTestDataData.getString("testTime");
+                    String testResult = bomTestDataData.getString("testResult");
+                    String correctedTorque = bomTestDataData.getString("correctedTorque");
+                    String correctedTime = bomTestDataData.getString("correctedTime");
+                    String correctedResult = bomTestDataData.getString("correctedResult");
+                    String userID = bomTestDataData.getString("userID");
+                    ///////////////
+                    String carMode = vinCode;
+                    carMode = m_MyDatabaseAdapter.getCarModelFromVinCode("'" + carMode + "'");
+                    String partName = m_MyDatabaseAdapter.getPartNameFromPartNo("'" + partCode + "'");
+                    String torque = testTorque;
+                    if(torque == null) {
+                        torque = "";
+                    }
+                    String torqueTime = testTime + ":00";
+                    //
+                    SimpleDateFormat curFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    String resultStr = "";
+                    try {
+                        Date dateObj = curFormater.parse(torqueTime);
+                        SimpleDateFormat curFormaterStr = new SimpleDateFormat("HH:mm");
+                        resultStr = curFormaterStr.format(dateObj);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
+                    //
+                    int torqueResult = Integer.parseInt(testResult);
+                    String correcttedTorque = correctedTorque;
+                    if(correcttedTorque.equals("null")) {
+                        correcttedTorque = "";
+                    }
+                    String correcttedTorqueTime = correctedTime + ":00";
+                    //
+                    SimpleDateFormat curFormaterCorrecttedTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    String resultStrCorrecttedTime = "";
+                    //if(!cur.getString(7).equals("")) {
+                    try {
+                        Date dateObj = curFormaterCorrecttedTime.parse(correcttedTorqueTime);
+                        SimpleDateFormat curFormaterStrCorrecttedTime = new SimpleDateFormat("HH:mm");
+                        resultStrCorrecttedTime = curFormaterStrCorrecttedTime.format(dateObj);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    //}
+
+                    //
+                    int correcttedTorqueResult = Integer.parseInt(correctedResult);
+                    String finalTorqueResult = "";
+                    if(torqueResult == 0) {
+                        finalTorqueResult = "合格";
+                    }
+                    else if(torqueResult == 1) {
+                        finalTorqueResult = "超下限";
+                    }
+                    else if(torqueResult == 2) {
+                        finalTorqueResult = "超上限";
+                    }
+
+                    String finalCorrecttedTorqueResult = "";
+                    if(correcttedTorqueResult == 0) {
+                        finalCorrecttedTorqueResult = "合格";
+                    }
+                    else if(correcttedTorqueResult == 1) {
+                        finalCorrecttedTorqueResult = "超下限";
+                    }
+                    else if(correcttedTorqueResult == 2) {
+                        finalCorrecttedTorqueResult = "超上限";
+                    }
+                    String userId = userID;
+                    TableCellView testResultTmp = new TableCellView(carMode, partName, partStation, torque, resultStr,
+                            finalTorqueResult, correcttedTorque, resultStrCorrecttedTime, finalCorrecttedTorqueResult, userId, testDate);
+                    testResultList.add(testResultTmp);
+                    ///////////////
+
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            if(bUpdate) {
+                //
+                TableLayout bodyTable = (TableLayout)findViewById(R.id.bodyTable);
+                bodyTable.removeAllViews();
+                for (int inx = 0; inx < testResultList.size(); inx ++) {
+                    TableCellView cellView = testResultList.get(inx);
+                    TableRow table_row = (TableRow) getLayoutInflater().inflate(R.layout.table_row, null);
+                    table_row.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            // TODO: do your logic here
+                            //Log.d("ListViewTableActivity", " on click ");
+                        }
+                    });
+                    for (int jnx = 0; jnx < 9; jnx++) {
+                        TextView table_row_text = (TextView) getLayoutInflater().inflate(R.layout.table_row_text, null);
+                        TableRow.LayoutParams lp = (TableRow.LayoutParams)table_row_text.getLayoutParams();
+                        if (lp == null) {
+                            lp = new TableRow.LayoutParams(
+                                    TableRow.LayoutParams.WRAP_CONTENT,
+                                    TableRow.LayoutParams.WRAP_CONTENT);
+                        }
+                        lp.weight = 1;
+                        table_row_text.setLayoutParams(lp);
+                        String result1 = cellView.getAt(jnx);
+                        table_row_text.setText(result1);
+                        table_row.addView(table_row_text);
+                    }
+                    bodyTable.addView(table_row);
+                }
+                filterTestResult();
+                //
+            }
+            showProgress(false);
+            super.onPostExecute(result);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        showProgress(true);
+        new DownloadDataTask().execute();
+    }
+
     //filter testResult
     private void filterTestResult() {
         TableLayout bodyTable = (TableLayout)findViewById(R.id.bodyTable);
@@ -413,12 +642,12 @@ public class ScanHistory extends Activity {
             if(!selectedPerson.equals("") && !selectedPerson.equals(userName)) {
                 continue;
             }
-            if(!selectedPara.equals("") && !selectedPara.equals(cellView.getAt(0))) {
+            /*if(!selectedPara.equals("") && !selectedPara.equals(cellView.getAt(0))) {
                 continue;
             }
             if(!selectedName.equals("") && !selectedName.equals(cellView.getAt(1))) {
                 continue;
-            }
+            }*/
             SimpleDateFormat curFormater = new SimpleDateFormat("yyyy-MM-dd");
             Date dateObj = null;
             try {
@@ -551,5 +780,28 @@ public class ScanHistory extends Activity {
         catch (InvocationTargetException e) {}
         catch (IllegalAccessException e) {}
         catch (IllegalArgumentException e) {}
+    }
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+    public void showProgress(final boolean show) {
+        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
+        // for very easy animations. If available, use these APIs to fade-in
+        // the progress spinner.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+            mProgressView.bringToFront();
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mProgressView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+                }
+            });
+        } else {
+            // The ViewPropertyAnimator APIs are not available, so simply show
+            // and hide the relevant UI components.
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+        }
     }
 }

@@ -73,5 +73,14 @@ public class DataHolder {
     public static void setBlueToothDeviceAddress(String blueToothDeviceAddress) {
         DataHolder.blueToothDeviceAddress = blueToothDeviceAddress;
     }
+
+    //
+    private static Boolean bluetoothStatus = false;
+    public static Boolean getBlueToothStatus() {
+        return bluetoothStatus;
+    }
+    public static void setBlueToothStatus(Boolean bluetoothStatus) {
+        DataHolder.bluetoothStatus = bluetoothStatus;
+    }
 }
 

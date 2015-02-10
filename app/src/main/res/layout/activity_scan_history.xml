@@ -1,8 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="fill_parent"
     android:background="@color/backgroundcolor"
     android:layout_height="fill_parent">
+    <ProgressBar android:id="@+id/login_progress" style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp" android:visibility="gone"
+        android:layout_centerInParent="true"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -50,22 +58,26 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="车辆型号"
+            android:visibility="gone"
             >
         </TextView>
         <Spinner android:id="@+id/spinnerpara"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"/>
+            android:layout_weight="1"
+            android:visibility="gone"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="零件名称"
+            android:visibility="gone"
             >
         </TextView>
             <Spinner android:id="@+id/spinnername"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"/>
+                android:layout_weight="1"
+                android:visibility="gone"/>
         <ImageButton
             android:id="@+id/filterbutton"
             android:layout_width="wrap_content"
@@ -73,6 +85,7 @@
             android:src="@drawable/ic_action_send_now"
             android:background="@android:color/transparent"
             android:layout_gravity="center"
+            android:visibility="gone"
             />
 
         </LinearLayout>
@@ -117,4 +130,5 @@
             </TableLayout>
         </ScrollView>
     </com.example.firegnu.torquewrenchdemo.ListViewTable>
-</LinearLayout>
+    </LinearLayout>
+</RelativeLayout>
