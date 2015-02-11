@@ -103,15 +103,15 @@
         <TableLayout android:layout_height="wrap_content"
             android:layout_width="match_parent" android:id="@+id/headerTable">
             <TableRow style="@style/tableHeaderRow">
-                <TextView style="@style/tableHeaderText" android:text="@string/header_text1"  />
-                <TextView style="@style/tableHeaderText" android:text="@string/header_text2"  />
-                <TextView style="@style/tableHeaderText" android:text="@string/header_text3"  />
-                <TextView style="@style/tableHeaderText" android:text="@string/header_text4" />
-                <TextView style="@style/tableHeaderText" android:text="@string/header_text5" />
-                <TextView style="@style/tableHeaderText" android:text="@string/header_text6" />
-                <TextView style="@style/tableHeaderText" android:text="@string/header_text7" />
-                <TextView style="@style/tableHeaderText" android:text="@string/header_text8" />
-                <TextView style="@style/tableHeaderText" android:text="@string/header_text9" />
+                <TextView style="@style/tableHeaderText" android:layout_weight="4" android:text="@string/header_text1"  />
+                <TextView style="@style/tableHeaderText" android:layout_weight="4" android:text="@string/header_text2"  />
+                <TextView style="@style/tableHeaderText" android:layout_weight="4" android:text="@string/header_text3"  />
+                <TextView style="@style/tableHeaderText" android:layout_weight="4" android:text="@string/header_text4" />
+                <TextView style="@style/tableHeaderText" android:layout_weight="2" android:text="@string/header_text5" />
+                <TextView style="@style/tableHeaderText" android:layout_weight="2" android:text="@string/header_text6" />
+                <TextView style="@style/tableHeaderText" android:layout_weight="4" android:text="@string/header_text7" />
+                <TextView style="@style/tableHeaderText" android:layout_weight="2" android:text="@string/header_text8" />
+                <TextView style="@style/tableHeaderText" android:layout_weight="2" android:text="@string/header_text9" />
             </TableRow>
             <TableRow style="@style/tableBodyRow">
                 <TextView android:text="@string/dummy" style="@style/tableBodyText" android:height="0dp" />

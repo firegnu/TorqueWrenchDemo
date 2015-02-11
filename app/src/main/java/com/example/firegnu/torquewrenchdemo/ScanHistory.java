@@ -696,10 +696,20 @@ public class ScanHistory extends Activity {
             month += 1;
             String result = "";
             if(month < 10) {
-                result = year+"-"+"0"+month+"-"+day;
+                if(day < 10) {
+                    result = year+"-"+"0"+month+"-"+"0"+day;
+                }
+                else {
+                    result = year+"-"+"0"+month+"-"+day;
+                }
             }
             else {
-                result = year+"-"+month+"-"+day;
+                if(day < 10) {
+                    result = year+"-"+month+"-"+"0"+day;
+                }
+                else {
+                    result = year+"-"+month+"-"+day;
+                }
             }
             showDate.setText(result);
             filterTestResult();
