@@ -326,28 +326,6 @@ public class LoginActivity extends Activity {
                 DataHolder.setUserId(idList.get(userIndex));
                 DataHolder.setUserPassword(password);
                 DataHolder.setUserType(typeList.get(userIndex));
-            /*SharedPreferences settings = getApplicationContext().getSharedPreferences("serveraddress", 0);
-            String serverAddress = settings.getString("serveraddress", "");
-            if(serverAddress.equals("")) {
-                Toast toast = Toast.makeText(getApplicationContext(),
-                        "服务器地址不能为空", Toast.LENGTH_LONG);
-                toast.setGravity(Gravity.CENTER, 0, 0);
-                toast.show();
-            }
-            //else {
-                DataHolder.setServerAddress("http://" + serverAddress);
-                DataHolder.setUserName(nameList.get(userIndex));
-                DataHolder.setUserId(idList.get(userIndex));
-                DataHolder.setUserPassword(password);
-                DataHolder.setUserType(typeList.get(userIndex));
-                //need sync from server
-                /*SharedPreferences settingsLastSyncTime = getApplicationContext().getSharedPreferences("lastAsyncTime", 0);
-                String lastSyncTime = settingsLastSyncTime.getString("lastAsyncTime", "");
-                if(lastSyncTime.equals("")) {
-                    showProgress(true);
-                    asyncDataFromServer();
-                }*/
-                ////////////////////////////////////////////
                 if(!lastSyncTime.equals("")) {
                     SharedPreferences settingsAutoRefresh = getApplicationContext().getSharedPreferences("bAutoRefresh", 0);
                     Boolean bDataRefresh = settingsAutoRefresh.getBoolean("bAutoRefresh", false);
@@ -365,9 +343,6 @@ public class LoginActivity extends Activity {
                         finish();
                     }
                 }
-
-                //}
-
             } else {
                 Toast toast = Toast.makeText(getApplicationContext(),
                         "密码错误", Toast.LENGTH_LONG);
