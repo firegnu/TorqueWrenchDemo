@@ -47,22 +47,24 @@
                 android:id="@+id/shoucetextedit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="2"
+                android:layout_weight="6"
                 android:paddingTop="5dp"
                 android:paddingBottom="5dp"
+                android:textSize="14sp"
                 android:editable="false"/>
             <TextView
                 android:id="@+id/textview2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="首测时间"/>
+                android:text="时间"/>
             <EditText
                 android:id="@+id/shoucetimetextedit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="2"
+                android:layout_weight="6"
                 android:paddingTop="5dp"
                 android:paddingBottom="5dp"
+                android:textSize="14sp"
                 android:editable="false"/>
             <CheckBox
                 android:id="@+id/shoucecheckbox"
@@ -92,12 +94,13 @@
                 android:layout_weight="2"
                 android:paddingTop="5dp"
                 android:paddingBottom="5dp"
+                android:textSize="14sp"
                 android:editable="false"/>
             <TextView
                 android:id="@+id/textview4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="修正时间"/>
+                android:text="时间"/>
             <EditText
                 android:id="@+id/xiuzhengtimetextedit"
                 android:layout_width="wrap_content"
@@ -105,6 +108,7 @@
                 android:layout_weight="2"
                 android:paddingTop="5dp"
                 android:paddingBottom="5dp"
+                android:textSize="14sp"
                 android:editable="false"/>
             <CheckBox
                 android:id="@+id/xiuzhengcheckbox"

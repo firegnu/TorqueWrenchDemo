@@ -32,6 +32,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Vibrator;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -80,7 +82,8 @@ public class ScanChassisActivity extends Activity {
     protected static final String TAG = "ScanChassisActivity";
     private BluetoothAdapter mBluetoothAdapter;
     private Handler mHandler;
-    private List<BluetoothDevice> mDevices = new ArrayList<BluetoothDevice>();;
+    private Handler mRssiHandler;
+    private List<BluetoothDevice> mDevices = new ArrayList<BluetoothDevice>();
     private BluetoothLeService mBluetoothLeService;
     protected boolean mConnected;
 
@@ -102,6 +105,7 @@ public class ScanChassisActivity extends Activity {
     private String resultDataStr4 = "";
 
     int clickedIndex = -1;
+    private List<Integer> gonweiNeededToBeTestList = new ArrayList<Integer>();
 
     private View mProgressView;
 
@@ -252,17 +256,14 @@ public class ScanChassisActivity extends Activity {
         firstScanButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*Intent intent = new Intent("com.google.zxing.client.android.SCAN");
-                intent.putExtra("SCAN_MODE", "QR_CODE_MODE, PRODUCT_MODE");
-                intent.putExtra("PROMPT_MESSAGE", "开始扫描底盘Vin码");
-                startActivityForResult(intent, 0);*/
-
-                IntentIntegrator integrator = new IntentIntegrator(ScanChassisActivity.this);
+                /*IntentIntegrator integrator = new IntentIntegrator(ScanChassisActivity.this);
                 integrator.setCaptureLayout(R.layout.custom_capture_layout);
                 integrator.setPrompt("开始扫描底盘Vin码");
                 integrator.setDesiredBarcodeFormats(IntentIntegrator.ALL_CODE_TYPES);
                 integrator.autoWide();
-                integrator.initiateScan();
+                integrator.initiateScan();*/
+                final EditText firstResult = (EditText)findViewById(R.id.firstscanresulttextview);
+                firstResult.setText("");
             }
         });
 
@@ -270,22 +271,92 @@ public class ScanChassisActivity extends Activity {
         sencondScanButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*Intent intent = new Intent("com.google.zxing.client.android.SCAN");
-                intent.putExtra("SCAN_MODE", "QR_CODE_MODE, PRODUCT_MODE");
-                intent.putExtra("PROMPT_MESSAGE", "开始扫描零件号");
-                startActivityForResult(intent, 0);*/
-
-                IntentIntegrator integrator = new IntentIntegrator(ScanChassisActivity.this);
+                /*IntentIntegrator integrator = new IntentIntegrator(ScanChassisActivity.this);
                 integrator.setCaptureLayout(R.layout.custom_capture_layout);
                 integrator.setPrompt("开始扫描零件号");
                 integrator.setDesiredBarcodeFormats(IntentIntegrator.ALL_CODE_TYPES);
                 integrator.autoWide();
-                integrator.initiateScan();
+                integrator.initiateScan();*/
+                final EditText sencondResult = (EditText)findViewById(R.id.sencondscanresulttextview);
+                sencondResult.setText("");
             }
         });
 
         final EditText firstResult = (EditText)findViewById(R.id.firstscanresulttextview);
-        firstResult.setOnClickListener(new View.OnClickListener() {
+        //scan finished
+        firstResult.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                LinearLayout firstStepLiearlayout = (LinearLayout)firstStepLayout.findViewById(R.id.firstchildlayout);
+                firstStepLiearlayout.removeAllViews();
+                //
+                String carMode = m_MyDatabaseAdapter.getInfoFromVinCode("'" + s.toString() + "'");//'E52581'
+                gVinCode = s.toString();
+                if(!carMode.equals("")) {
+                    gCarMode = carMode;
+                    EditText firstResultSuccessful = (EditText)findViewById(R.id.firstresultsuccesful);
+                    firstResultSuccessful.setText("查询成功");
+                    //carmodel
+                    final LinearLayout lingjianModelLayout = (LinearLayout) layoutInflater.inflate(R.layout.firststepcarmodelname, null);
+                    LinearLayout.LayoutParams lpCarModel = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+                    lpCarModel.setMargins(0, 0,
+                            0, 10);
+                    lingjianModelLayout.setLayoutParams(lpCarModel);
+                    EditText firstCarModelResult = (EditText)lingjianModelLayout.findViewById(R.id.vincodecarmodelfirstedit);
+                    firstCarModelResult.setText(carMode);
+                    firstStepLiearlayout.addView(lingjianModelLayout);
+                    //
+                    List<String> partNoList = new ArrayList<String>();
+                    Cursor cur = m_MyDatabaseAdapter.getPartListfromCarModel("'" + carMode + "'");
+                    if (cur != null) {
+                        if (cur.moveToFirst()) {
+                            do {
+                                String partNo = cur.getString(0);
+                                partNoList.add(partNo);
+                            } while (cur.moveToNext());
+                        }
+                        cur.close();
+                    }
+                    for(int i = 0; i < partNoList.size(); i++) {
+                        final LinearLayout lingjianCodeLayout = (LinearLayout) layoutInflater.inflate(R.layout.dipan_lingjian_code, null);
+                        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+                        lp.setMargins(0, 0,
+                                0, 10);
+                        lingjianCodeLayout.setLayoutParams(lp);
+                        firstStepLiearlayout.addView(lingjianCodeLayout);
+                        TextView lingjianName = (TextView)lingjianCodeLayout.findViewById(R.id.lingjianpartnotextview);
+                        lingjianName.setText(partNoList.get(i).toString());
+                    }
+                }
+                else {
+                    EditText firstResultSuccessful = (EditText)findViewById(R.id.firstresultsuccesful);
+                    firstResultSuccessful.setText("查询失败");
+                }
+                //把第二个和第三个清空
+                final LinearLayout sencondLayout = (LinearLayout)findViewById(R.id.sencondscanresult);
+                sencondLayout.removeAllViews();
+                EditText sencondResult = (EditText)findViewById(R.id.sencondscanresulttextview);
+                sencondResult.setText("");
+                EditText sencondResultSuccessful = (EditText)findViewById(R.id.sencondResultSuccessful);
+                sencondResultSuccessful.setText("");
+
+                LinearLayout thirdStepLiearlayout = (LinearLayout)thirdStepLayout.findViewById(R.id.thirdchildlayout);
+                thirdStepLiearlayout.removeAllViews();
+            }
+        });
+        //
+        /*firstResult.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 LayoutInflater li = LayoutInflater.from(context);
@@ -372,11 +443,355 @@ public class ScanChassisActivity extends Activity {
                 AlertDialog alertDialog = alertDialogBuilder.create();
                 alertDialog.show();
             }
-        });
+
+
+        });*/
 
         //sencond
         final EditText sencondResult = (EditText)findViewById(R.id.sencondscanresulttextview);
-        sencondResult.setOnClickListener(new View.OnClickListener() {
+        sencondResult.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+                gPartCode = s.toString();
+                /////
+                final LinearLayout sencondLayout = (LinearLayout)findViewById(R.id.sencondscanresult);
+                sencondLayout.removeAllViews();
+                LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                LinearLayout thirdStepLiearlayout = (LinearLayout)thirdStepLayout.findViewById(R.id.thirdchildlayout);
+                thirdStepLiearlayout.removeAllViews();
+                EditText sencondResultSuccessful = (EditText)findViewById(R.id.sencondResultSuccessful);
+                //sencondstep layout add test data
+                //String partCode, String vinCode, String model
+                Cursor cur = m_MyDatabaseAdapter.getPartInfoFromPartNo("'" + s.toString() + "'",
+                        "'" + gVinCode + "'", "'" + gCarMode + "'");//
+                Boolean bQuery = false;
+                String partName = "";
+                String boltType = "";
+                int boltNum = 0;
+                float stardardValue = 0;
+                float valueRange = 0;
+                float limitRange = 0;
+                String workmanShip = "";
+                //
+                final LinearLayout sencondResultLayout = (LinearLayout) layoutInflater.inflate(R.layout.sencondscanresult, null);
+                final EditText sencondPartName = (EditText)sencondResultLayout.findViewById(R.id.sencondpartname);
+                sencondPartName.setText("");
+                Spinner sencondBoldTypeSpinner = (Spinner)sencondResultLayout.findViewById(R.id.boldtype);
+                //sencondBoldType.setText("");
+                final EditText sencondBoldNum = (EditText)sencondResultLayout.findViewById(R.id.boldnum);
+                sencondBoldNum.setText("");
+                final EditText sencondStardardValue = (EditText)sencondResultLayout.findViewById(R.id.stardardvalue);
+                sencondStardardValue.setText("");
+                final EditText sencondValueRange = (EditText)sencondResultLayout.findViewById(R.id.valueRange);
+                sencondValueRange.setText("");
+                final EditText sencondLimitRange = (EditText)sencondResultLayout.findViewById(R.id.limitrange);
+                sencondLimitRange.setText("");
+                final EditText sencondWorkManShip = (EditText)sencondResultLayout.findViewById(R.id.workmanship);
+                sencondWorkManShip.setText("");
+
+                final List<String> listBoltType = new ArrayList<String>();
+                final List<String> partNameList = new ArrayList<String>();
+                final List<Integer> boltNumList = new ArrayList<Integer>();
+                final List<Float> stardardValueList = new ArrayList<Float>();
+                final List<Float> valueRangeList = new ArrayList<Float>();
+                final List<Float> limitRangeList = new ArrayList<Float>();
+                final List<String> workmanShipList = new ArrayList<String>();
+                if (cur != null) {
+                    if (cur.moveToFirst()) {
+                        do {
+                            bQuery = true;
+                            partName = cur.getString(3);
+                            partNameList.add(partName);
+                            boltType = cur.getString(2);
+                            listBoltType.add(boltType);
+                            boltNum = cur.getInt(8);
+                            boltNumList.add(boltNum);
+                            stardardValue = cur.getFloat(4);
+                            stardardValueList.add(stardardValue);
+                            valueRange = cur.getFloat(5);
+                            valueRangeList.add(valueRange);
+                            limitRange = cur.getFloat(6);
+                            limitRangeList.add(limitRange);
+                            workmanShip = cur.getString(7);
+                            workmanShipList.add(workmanShip);
+                        } while (cur.moveToNext());
+                    }
+                    cur.close();
+                }
+                if(bQuery) {
+                    sencondResultSuccessful.setText("查询成功");
+                    gonweiNeededToBeTestList.clear();
+                    //发送零件相关信息
+                    sendData("C5 01 02 01 02 03");
+                    LinearLayout.LayoutParams lpsencondResult = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+                    lpsencondResult.setMargins(0, 0,
+                            0, 10);
+                    sencondResultLayout.setLayoutParams(lpsencondResult);
+                    //final LinearLayout sencondLayout = (LinearLayout)findViewById(R.id.sencondscanresult);
+                    sencondLayout.addView(sencondResultLayout);
+                    ////////////////
+                    final ArrayAdapter<String> adapterBoltType = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, listBoltType);
+                    adapterBoltType.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    sencondBoldTypeSpinner.setAdapter(adapterBoltType);
+
+                    sencondBoldTypeSpinner.setOnItemSelectedListener(new Spinner.OnItemSelectedListener(){
+                        public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+                            //selectedPerson = adapterBoltType.getItem(arg2);
+                            sencondPartName.setText(partNameList.get(arg2));
+                            sencondBoldNum.setText(Integer.toString(boltNumList.get(arg2)));
+                            sencondStardardValue.setText(Float.toString(stardardValueList.get(arg2)));
+                            sencondValueRange.setText(Float.toString(valueRangeList.get(arg2)));
+                            sencondLimitRange.setText(Float.toString(limitRangeList.get(arg2)));
+                            sencondWorkManShip.setText(workmanShipList.get(arg2));
+                            arg0.setVisibility(View.VISIBLE);
+                        }
+                        public void onNothingSelected(AdapterView<?> arg0) {
+                            // TODO Auto-generated method stub
+                            //selectedPerson = "";
+                            arg0.setVisibility(View.VISIBLE);
+                        }
+                    });
+
+                    sencondBoldTypeSpinner.setOnTouchListener(new Spinner.OnTouchListener(){
+                        public boolean onTouch(View v, MotionEvent event) {
+                            // TODO Auto-generated method stub
+                            return false;
+                        }
+                    });
+
+                    sencondBoldTypeSpinner.setOnFocusChangeListener(new Spinner.OnFocusChangeListener(){
+                        public void onFocusChange(View v, boolean hasFocus) {
+                            // TODO Auto-generated method stub
+
+                        }
+                    });
+                    ////////////////////
+                    Cursor thirdCur = m_MyDatabaseAdapter.getGongweiCount("'" + gPartCode + "'", "'" + gVinCode + "'");
+                    int gongweiCount = 0;
+                    final List<String> listBoltNumList = new ArrayList<String>();
+                    if (thirdCur != null) {
+                        if (thirdCur.moveToFirst()) {
+                            do {
+                                listBoltNumList.add(thirdCur.getString(0));
+                                gongweiCount++;
+                            } while (thirdCur.moveToNext());
+                        }
+                        thirdCur.close();
+                    }
+                    for(int i = 0; i < gongweiCount; i++) {
+                        final LinearLayout luosiLayout = (LinearLayout) layoutInflater.inflate(R.layout.test_torque_wrench, null);
+                        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+                        lp.setMargins(0, 0,
+                                10, 10);
+                        luosiLayout.setLayoutParams(lp);
+                        luosiLayout.setTag(i);
+                        thirdStepLiearlayout.addView(luosiLayout);
+                        TextView gongweiNameTextView  = (TextView)luosiLayout.findViewById(R.id.gongweimingchengtextview);
+                        //首次进入开始填写数据有则填没有则不填，没有则点亮,如果有首检数据则变灰
+                        Cursor testCorqueDataCur = m_MyDatabaseAdapter.getTestDataForGongwei("'" + listBoltNumList.get(i) + "'",
+                                "'" + gPartCode + "'", "'" + gVinCode + "'");
+                        if (testCorqueDataCur != null) {
+                            if (testCorqueDataCur.moveToFirst()) {
+                                do {
+                                    String testTorque = testCorqueDataCur.getString(0);
+                                    String testTime = testCorqueDataCur.getString(1);
+                                    String testResult = testCorqueDataCur.getString(2);
+                                    String correctedTorque = testCorqueDataCur.getString(3);
+                                    String correctedTime = testCorqueDataCur.getString(4);
+                                    String correctedResult = testCorqueDataCur.getString(5);
+                                    if(!testTime.equals("")) {
+                                        SimpleDateFormat curFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+                                        String resultStr = "";
+                                        try {
+                                            Date dateObj = curFormater.parse(testTime);
+                                            SimpleDateFormat curFormaterStr = new SimpleDateFormat("HH:mm");
+                                            resultStr = curFormaterStr.format(dateObj);
+                                            EditText shoujianTorqueTimeEdit = (EditText)luosiLayout.findViewById(R.id.shoucetimetextedit);
+                                            shoujianTorqueTimeEdit.setText(resultStr);
+                                            CheckBox shoujianCheckBox = (CheckBox)luosiLayout.findViewById(R.id.shoucecheckbox);
+                                            shoujianCheckBox.setChecked(true);
+                                        } catch (ParseException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+
+                                    EditText shoujianTorqueEdit = (EditText)luosiLayout.findViewById(R.id.shoucetextedit);
+                                    shoujianTorqueEdit.setText(testTorque);
+
+                                    TextView shoujianResultTextView = (TextView)luosiLayout.findViewById(R.id.shouceresult);
+                                    if(testResult.equals("0")) {
+                                        shoujianResultTextView.setText("合格");
+                                        shoujianResultTextView.setTextColor(getResources().getColor(R.color.greenbutton));
+                                    }
+                                    else if(testResult.equals("1")) {
+                                        shoujianResultTextView.setText("超下限");
+                                        shoujianResultTextView.setTextColor(getResources().getColor(R.color.theme_default_primary));
+                                    }
+                                    else if(testResult.equals("2")) {
+                                        shoujianResultTextView.setText("超上限");
+                                        shoujianResultTextView.setTextColor(getResources().getColor(R.color.theme_default_primary));
+                                    }
+
+                                    EditText xiuzhengTorqueEdit = (EditText)luosiLayout.findViewById(R.id.xiuzhengtextedit);
+                                    xiuzhengTorqueEdit.setText(correctedTorque);
+
+
+                                    TextView xiuzhengResultTextView = (TextView)luosiLayout.findViewById(R.id.xiuzhengresult);
+                                    if(correctedResult.equals("0")) {
+                                        xiuzhengResultTextView.setText("合格");
+                                        xiuzhengResultTextView.setTextColor(getResources().getColor(R.color.greenbutton));
+                                    }
+                                    else if(correctedResult.equals("1")) {
+                                        xiuzhengResultTextView.setText("超下限");
+                                        xiuzhengResultTextView.setTextColor(getResources().getColor(R.color.theme_default_primary));
+                                    }
+                                    else if(correctedResult.equals("2")) {
+                                        xiuzhengResultTextView.setText("超上限");
+                                        xiuzhengResultTextView.setTextColor(getResources().getColor(R.color.theme_default_primary));
+                                    }
+                                    if(!correctedTime.equals("")) {
+                                        SimpleDateFormat curFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+                                        String resultStr = "";
+                                        try {
+                                            Date dateObj = curFormater.parse(correctedTime);
+                                            SimpleDateFormat curFormaterStr = new SimpleDateFormat("HH:mm");
+                                            resultStr = curFormaterStr.format(dateObj);
+                                            EditText xiuzhengTorqueTimeEdit = (EditText)luosiLayout.findViewById(R.id.xiuzhengtimetextedit);
+                                            xiuzhengTorqueTimeEdit.setText(resultStr);
+                                            CheckBox xiuzhengCheckBox = (CheckBox)luosiLayout.findViewById(R.id.xiuzhengcheckbox);
+                                            xiuzhengCheckBox.setChecked(true);
+                                        } catch (ParseException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                    //有数据的全部变灰
+                                    TextView textView0 = (TextView)luosiLayout.findViewById(R.id.gongweimingchengtextview);
+                                    TextView textView1 = (TextView)luosiLayout.findViewById(R.id.textview1);
+                                    TextView textView2 = (TextView)luosiLayout.findViewById(R.id.textview2);
+                                    TextView textView3 = (TextView)luosiLayout.findViewById(R.id.textview3);
+                                    TextView textView4 = (TextView)luosiLayout.findViewById(R.id.textview4);
+                                    TextView textView5 = (TextView)luosiLayout.findViewById(R.id.shouceresult);
+                                    TextView textView6 = (TextView)luosiLayout.findViewById(R.id.xiuzhengresult);
+
+
+                                    EditText editText1 = (EditText)luosiLayout.findViewById(R.id.shoucetextedit);
+                                    EditText editText2 = (EditText)luosiLayout.findViewById(R.id.shoucetimetextedit);
+                                    EditText editText3 = (EditText)luosiLayout.findViewById(R.id.xiuzhengtextedit);
+                                    EditText editText4 = (EditText)luosiLayout.findViewById(R.id.xiuzhengtimetextedit);
+                                    textView0.setTextColor(getResources().getColor(R.color.hint));
+                                    textView1.setTextColor(getResources().getColor(R.color.hint));
+                                    textView2.setTextColor(getResources().getColor(R.color.hint));
+                                    textView3.setTextColor(getResources().getColor(R.color.hint));
+                                    textView4.setTextColor(getResources().getColor(R.color.hint));
+                                    textView5.setTextColor(getResources().getColor(R.color.hint));
+                                    textView6.setTextColor(getResources().getColor(R.color.hint));
+
+                                    editText1.setTextColor(getResources().getColor(R.color.hint));
+                                    editText2.setTextColor(getResources().getColor(R.color.hint));
+                                    editText3.setTextColor(getResources().getColor(R.color.hint));
+                                    editText4.setTextColor(getResources().getColor(R.color.hint));
+                                    //
+                                } while (testCorqueDataCur.moveToNext());
+                            }
+                            else {
+                                gonweiNeededToBeTestList.add(i);
+                            }
+                            testCorqueDataCur.close();
+                        }
+                        //
+                        gongweiNameTextView.setText(listBoltNumList.get(i));
+                        ////
+                        ImageButton gongweiButton = (ImageButton)luosiLayout.findViewById(R.id.luoshuanbutton);
+                        gongweiButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                //其他的变灰
+                                LinearLayout luosiLayoutButton = (LinearLayout)view.getParent().getParent();
+                                clickedIndex = (int)luosiLayoutButton.getTag();
+                                LinearLayout thirdStepLiearlayout = (LinearLayout)thirdStepLayout.findViewById(R.id.thirdchildlayout);
+                                for(int i = 0; i < thirdStepLiearlayout.getChildCount(); i++) {
+                                    LinearLayout luosiLayout = (LinearLayout)thirdStepLiearlayout.getChildAt(i);
+                                    TextView textView0 = (TextView)luosiLayout.findViewById(R.id.gongweimingchengtextview);
+                                    TextView textView1 = (TextView)luosiLayout.findViewById(R.id.textview1);
+                                    TextView textView2 = (TextView)luosiLayout.findViewById(R.id.textview2);
+                                    TextView textView3 = (TextView)luosiLayout.findViewById(R.id.textview3);
+                                    TextView textView4 = (TextView)luosiLayout.findViewById(R.id.textview4);
+                                    TextView textView5 = (TextView)luosiLayout.findViewById(R.id.shouceresult);
+                                    TextView textView6 = (TextView)luosiLayout.findViewById(R.id.xiuzhengresult);
+
+
+                                    EditText editText1 = (EditText)luosiLayout.findViewById(R.id.shoucetextedit);
+                                    EditText editText2 = (EditText)luosiLayout.findViewById(R.id.shoucetimetextedit);
+                                    EditText editText3 = (EditText)luosiLayout.findViewById(R.id.xiuzhengtextedit);
+                                    EditText editText4 = (EditText)luosiLayout.findViewById(R.id.xiuzhengtimetextedit);
+                                    if(i == clickedIndex) {
+                                        textView0.setTextColor(getResources().getColor(R.color.pureblack));
+                                        textView1.setTextColor(getResources().getColor(R.color.pureblack));
+                                        textView2.setTextColor(getResources().getColor(R.color.pureblack));
+                                        textView3.setTextColor(getResources().getColor(R.color.pureblack));
+                                        textView4.setTextColor(getResources().getColor(R.color.pureblack));
+                                        /////textView5.setTextColor(getResources().getColor(R.color.pureblack));
+                                        /////textView6.setTextColor(getResources().getColor(R.color.pureblack));
+                                        if(textView5.getText().toString().equals("未检测")) {
+                                            textView5.setTextColor(getResources().getColor(R.color.pureblack));
+                                        }
+                                        if(textView6.getText().toString().equals("未修正")) {
+                                            textView6.setTextColor(getResources().getColor(R.color.pureblack));
+                                        }
+                                        editText1.setTextColor(getResources().getColor(R.color.pureblack));
+                                        editText2.setTextColor(getResources().getColor(R.color.pureblack));
+                                        editText3.setTextColor(getResources().getColor(R.color.pureblack));
+                                        editText4.setTextColor(getResources().getColor(R.color.pureblack));
+                                        gonweiNeededToBeTestList.add(i);
+                                    }
+                                                            /*else {
+                                                                textView0.setTextColor(getResources().getColor(R.color.hint));
+                                                                textView1.setTextColor(getResources().getColor(R.color.hint));
+                                                                textView2.setTextColor(getResources().getColor(R.color.hint));
+                                                                textView3.setTextColor(getResources().getColor(R.color.hint));
+                                                                textView4.setTextColor(getResources().getColor(R.color.hint));
+                                                                //////textView5.setTextColor(getResources().getColor(R.color.hint));
+                                                                //////textView6.setTextColor(getResources().getColor(R.color.hint));
+                                                                if(textView5.getText().toString().equals("未检测")) {
+                                                                    textView5.setTextColor(getResources().getColor(R.color.hint));
+                                                                }
+                                                                if(textView6.getText().toString().equals("未修正")) {
+                                                                    textView6.setTextColor(getResources().getColor(R.color.hint));
+                                                                }
+                                                                editText1.setTextColor(getResources().getColor(R.color.hint));
+                                                                editText2.setTextColor(getResources().getColor(R.color.hint));
+                                                                editText3.setTextColor(getResources().getColor(R.color.hint));
+                                                                editText4.setTextColor(getResources().getColor(R.color.hint));
+                                                            }*/
+                                }
+                            }
+                        });
+                        /////
+                    }
+                    //首次进入点亮所有没有首检数据的工位
+                    if(boltNum > 0) {
+                        /////LinearLayout luosiLayout = (LinearLayout)thirdStepLiearlayout.getChildAt(0);
+                        /////ImageButton firstImageButton = (ImageButton)luosiLayout.findViewById(R.id.luoshuanbutton);
+                        /////firstImageButton.performClick();
+                    }
+                }
+                else {
+                    sencondResultSuccessful.setText("查询失败");
+                }
+            }
+        });
+        /*sencondResult.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 LayoutInflater li = LayoutInflater.from(context);
@@ -462,6 +877,7 @@ public class ScanChassisActivity extends Activity {
                                         }
                                         if(bQuery) {
                                             sencondResultSuccessful.setText("查询成功");
+                                            gonweiNeededToBeTestList.clear();
                                             //发送零件相关信息
                                             sendData("C5 01 02 01 02 03");
                                             LinearLayout.LayoutParams lpsencondResult = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
@@ -528,7 +944,7 @@ public class ScanChassisActivity extends Activity {
                                                 luosiLayout.setTag(i);
                                                 thirdStepLiearlayout.addView(luosiLayout);
                                                 TextView gongweiNameTextView  = (TextView)luosiLayout.findViewById(R.id.gongweimingchengtextview);
-                                                //首次进入开始填写数据有则填没有则不填
+                                                //首次进入开始填写数据有则填没有则不填，没有则点亮,如果有首检数据则变灰
                                                 Cursor testCorqueDataCur = m_MyDatabaseAdapter.getTestDataForGongwei("'" + listBoltNumList.get(i) + "'",
                                                         "'" + gPartCode + "'", "'" + gVinCode + "'");
                                                 if (testCorqueDataCur != null) {
@@ -605,7 +1021,37 @@ public class ScanChassisActivity extends Activity {
                                                                     e.printStackTrace();
                                                                 }
                                                             }
+                                                            //有数据的全部变灰
+                                                            TextView textView0 = (TextView)luosiLayout.findViewById(R.id.gongweimingchengtextview);
+                                                            TextView textView1 = (TextView)luosiLayout.findViewById(R.id.textview1);
+                                                            TextView textView2 = (TextView)luosiLayout.findViewById(R.id.textview2);
+                                                            TextView textView3 = (TextView)luosiLayout.findViewById(R.id.textview3);
+                                                            TextView textView4 = (TextView)luosiLayout.findViewById(R.id.textview4);
+                                                            TextView textView5 = (TextView)luosiLayout.findViewById(R.id.shouceresult);
+                                                            TextView textView6 = (TextView)luosiLayout.findViewById(R.id.xiuzhengresult);
+
+
+                                                            EditText editText1 = (EditText)luosiLayout.findViewById(R.id.shoucetextedit);
+                                                            EditText editText2 = (EditText)luosiLayout.findViewById(R.id.shoucetimetextedit);
+                                                            EditText editText3 = (EditText)luosiLayout.findViewById(R.id.xiuzhengtextedit);
+                                                            EditText editText4 = (EditText)luosiLayout.findViewById(R.id.xiuzhengtimetextedit);
+                                                            textView0.setTextColor(getResources().getColor(R.color.hint));
+                                                            textView1.setTextColor(getResources().getColor(R.color.hint));
+                                                            textView2.setTextColor(getResources().getColor(R.color.hint));
+                                                            textView3.setTextColor(getResources().getColor(R.color.hint));
+                                                            textView4.setTextColor(getResources().getColor(R.color.hint));
+                                                            textView5.setTextColor(getResources().getColor(R.color.hint));
+                                                            textView6.setTextColor(getResources().getColor(R.color.hint));
+
+                                                            editText1.setTextColor(getResources().getColor(R.color.hint));
+                                                            editText2.setTextColor(getResources().getColor(R.color.hint));
+                                                            editText3.setTextColor(getResources().getColor(R.color.hint));
+                                                            editText4.setTextColor(getResources().getColor(R.color.hint));
+                                                            //
                                                         } while (testCorqueDataCur.moveToNext());
+                                                    }
+                                                    else {
+                                                        gonweiNeededToBeTestList.add(i);
                                                     }
                                                     testCorqueDataCur.close();
                                                 }
@@ -653,8 +1099,9 @@ public class ScanChassisActivity extends Activity {
                                                                 editText2.setTextColor(getResources().getColor(R.color.pureblack));
                                                                 editText3.setTextColor(getResources().getColor(R.color.pureblack));
                                                                 editText4.setTextColor(getResources().getColor(R.color.pureblack));
+                                                                gonweiNeededToBeTestList.add(i);
                                                             }
-                                                            else {
+                                                            /*else {
                                                                 textView0.setTextColor(getResources().getColor(R.color.hint));
                                                                 textView1.setTextColor(getResources().getColor(R.color.hint));
                                                                 textView2.setTextColor(getResources().getColor(R.color.hint));
@@ -672,17 +1119,17 @@ public class ScanChassisActivity extends Activity {
                                                                 editText2.setTextColor(getResources().getColor(R.color.hint));
                                                                 editText3.setTextColor(getResources().getColor(R.color.hint));
                                                                 editText4.setTextColor(getResources().getColor(R.color.hint));
-                                                            }
-                                                        }
+                                                            }*/
+/*                                                        }
                                                     }
                                                 });
                                                 /////
                                             }
-                                            //首次进入第一个被点亮
+                                            //首次进入点亮所有没有首检数据的工位
                                             if(boltNum > 0) {
-                                                LinearLayout luosiLayout = (LinearLayout)thirdStepLiearlayout.getChildAt(0);
-                                                ImageButton firstImageButton = (ImageButton)luosiLayout.findViewById(R.id.luoshuanbutton);
-                                                firstImageButton.performClick();
+                                                /////LinearLayout luosiLayout = (LinearLayout)thirdStepLiearlayout.getChildAt(0);
+                                                /////ImageButton firstImageButton = (ImageButton)luosiLayout.findViewById(R.id.luoshuanbutton);
+                                                /////firstImageButton.performClick();
                                             }
                                         }
                                         else {
@@ -699,7 +1146,7 @@ public class ScanChassisActivity extends Activity {
                 AlertDialog alertDialog = alertDialogBuilder.create();
                 alertDialog.show();
             }
-        });
+        });*/
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
@@ -867,6 +1314,7 @@ public class ScanChassisActivity extends Activity {
                     }
                     if(bQuery) {
                         sencondResultSuccessful.setText("查询成功");
+                        gonweiNeededToBeTestList.clear();
                         //发送零件相关信息
                         sendData("C5 01 02 01 02 03");
                         //
@@ -1012,8 +1460,36 @@ public class ScanChassisActivity extends Activity {
                                                 e.printStackTrace();
                                             }
                                         }
+                                        //有数据的全部变灰
+                                        TextView textView0 = (TextView)luosiLayout.findViewById(R.id.gongweimingchengtextview);
+                                        TextView textView1 = (TextView)luosiLayout.findViewById(R.id.textview1);
+                                        TextView textView2 = (TextView)luosiLayout.findViewById(R.id.textview2);
+                                        TextView textView3 = (TextView)luosiLayout.findViewById(R.id.textview3);
+                                        TextView textView4 = (TextView)luosiLayout.findViewById(R.id.textview4);
+                                        TextView textView5 = (TextView)luosiLayout.findViewById(R.id.shouceresult);
+                                        TextView textView6 = (TextView)luosiLayout.findViewById(R.id.xiuzhengresult);
 
+
+                                        EditText editText1 = (EditText)luosiLayout.findViewById(R.id.shoucetextedit);
+                                        EditText editText2 = (EditText)luosiLayout.findViewById(R.id.shoucetimetextedit);
+                                        EditText editText3 = (EditText)luosiLayout.findViewById(R.id.xiuzhengtextedit);
+                                        EditText editText4 = (EditText)luosiLayout.findViewById(R.id.xiuzhengtimetextedit);
+                                        textView0.setTextColor(getResources().getColor(R.color.hint));
+                                        textView1.setTextColor(getResources().getColor(R.color.hint));
+                                        textView2.setTextColor(getResources().getColor(R.color.hint));
+                                        textView3.setTextColor(getResources().getColor(R.color.hint));
+                                        textView4.setTextColor(getResources().getColor(R.color.hint));
+                                        textView5.setTextColor(getResources().getColor(R.color.hint));
+                                        textView6.setTextColor(getResources().getColor(R.color.hint));
+
+                                        editText1.setTextColor(getResources().getColor(R.color.hint));
+                                        editText2.setTextColor(getResources().getColor(R.color.hint));
+                                        editText3.setTextColor(getResources().getColor(R.color.hint));
+                                        editText4.setTextColor(getResources().getColor(R.color.hint));
                                     } while (testCorqueDataCur.moveToNext());
+                                }
+                                else {
+                                    gonweiNeededToBeTestList.add(i);
                                 }
                                 testCorqueDataCur.close();
                             }
@@ -1024,7 +1500,6 @@ public class ScanChassisActivity extends Activity {
                             gongweiButton.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
-                                    //其他的变灰
                                     LinearLayout luosiLayoutButton = (LinearLayout)view.getParent().getParent();
                                     clickedIndex = (int)luosiLayoutButton.getTag();
                                     LinearLayout thirdStepLiearlayout = (LinearLayout)thirdStepLayout.findViewById(R.id.thirdchildlayout);
@@ -1061,8 +1536,9 @@ public class ScanChassisActivity extends Activity {
                                             editText2.setTextColor(getResources().getColor(R.color.pureblack));
                                             editText3.setTextColor(getResources().getColor(R.color.pureblack));
                                             editText4.setTextColor(getResources().getColor(R.color.pureblack));
+                                            gonweiNeededToBeTestList.add(i);
                                         }
-                                        else {
+                                        /*else {
                                             textView0.setTextColor(getResources().getColor(R.color.hint));
                                             textView1.setTextColor(getResources().getColor(R.color.hint));
                                             textView2.setTextColor(getResources().getColor(R.color.hint));
@@ -1080,7 +1556,7 @@ public class ScanChassisActivity extends Activity {
                                             editText2.setTextColor(getResources().getColor(R.color.hint));
                                             editText3.setTextColor(getResources().getColor(R.color.hint));
                                             editText4.setTextColor(getResources().getColor(R.color.hint));
-                                        }
+                                        }*/
                                     }
                                 }
                             });
@@ -1088,9 +1564,9 @@ public class ScanChassisActivity extends Activity {
                         }
                         //首次进入第一个被点亮
                         if(boltNum > 0) {
-                            LinearLayout luosiLayout = (LinearLayout)thirdStepLiearlayout.getChildAt(0);
+                            /*LinearLayout luosiLayout = (LinearLayout)thirdStepLiearlayout.getChildAt(0);
                             ImageButton firstImageButton = (ImageButton)luosiLayout.findViewById(R.id.luoshuanbutton);
-                            firstImageButton.performClick();
+                            firstImageButton.performClick();*/
                         }
                     }
                     else {
@@ -1184,9 +1660,24 @@ public class ScanChassisActivity extends Activity {
     ///////////////////////////////////////////////////////////bluetooth
     private void initBlueTooth() {
         mHandler = new Handler();
+        mRssiHandler = new Handler();
+        mRssiHandler.postDelayed(runnable, 200);
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
     }
+
+    final Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            //读取RSSI
+            if (mBluetoothLeService != null) {
+                mBluetoothLeService.update_rssi();
+                //updateConnectionState(R.string.connected, mBluetoothLeService.get_rssi() + "");
+                setTitle("信号强度:" + mBluetoothLeService.get_rssi() + "db");
+            }
+            mHandler.postDelayed(this, 200);
+        }
+    };
 
     /**
      * 蓝牙自动连接
@@ -1467,6 +1958,108 @@ public class ScanChassisActivity extends Activity {
             resultDataStr3 = map.get("结论");
             resultDataStr4 = map.get("日期");
             Iterator<String> it = map.keySet().iterator();
+            //
+            if(gonweiNeededToBeTestList.size() > 0) {
+                LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                LinearLayout thirdStepLiearlayout = (LinearLayout)thirdStepLayout.findViewById(R.id.thirdchildlayout);
+                for(int i = 0; i < thirdStepLiearlayout.getChildCount(); i++) {
+                    if(gonweiNeededToBeTestList.contains(i)) {
+                        //
+                        LinearLayout luosiLayout = (LinearLayout)thirdStepLiearlayout.getChildAt(i);
+                        EditText shouceTextEdit = (EditText)luosiLayout.findViewById(R.id.shoucetextedit);
+                        EditText shouceTimeTextEdit = (EditText)luosiLayout.findViewById(R.id.shoucetimetextedit);
+                        CheckBox shouceCheckbox = (CheckBox)luosiLayout.findViewById(R.id.shoucecheckbox);
+                        TextView shouceResult = (TextView)luosiLayout.findViewById(R.id.shouceresult);
+
+                        EditText xiuzhengTextEdit = (EditText)luosiLayout.findViewById(R.id.xiuzhengtextedit);
+                        EditText xiuzhengTimeTextEdit = (EditText)luosiLayout.findViewById(R.id.xiuzhengtimetextedit);
+                        CheckBox xiuzhengCheckbox = (CheckBox)luosiLayout.findViewById(R.id.xiuzhengcheckbox);
+                        TextView xiuzhengResult = (TextView)luosiLayout.findViewById(R.id.xiuzhengresult);
+
+                        TextView gongweiNameTextView = (TextView)luosiLayout.findViewById(R.id.gongweimingchengtextview);
+                        String gongweiName = gongweiNameTextView.getText().toString();
+                        if(shouceTextEdit.getText().toString().equals("")) {
+                            //首测为空直接插入表中首测数据
+                            shouceTextEdit.setText(resultDataStr2);
+                            shouceTimeTextEdit.setText(resultDataStr1);
+                            shouceCheckbox.setChecked(true);
+                            shouceResult.setText(resultDataStr3);
+                            String resultTest = "";
+                            if(resultDataStr3.equals("合格")) {
+                                resultTest = "0";
+                                shouceResult.setTextColor(getResources().getColor(R.color.greenbutton));
+                            }
+                            else if(resultDataStr3.equals("超下限")) {
+                                resultTest = "1";
+                                shouceResult.setTextColor(getResources().getColor(R.color.theme_default_primary));
+                            }
+                            else {
+                                resultTest = "2";
+                                shouceResult.setTextColor(getResources().getColor(R.color.theme_default_primary));
+                            }
+                            String resultTime = resultDataStr4 + " " + resultDataStr1;
+                            m_MyDatabaseAdapter.insertTestDataTableBlueTooth(gVinCode, gPartCode, gongweiName, resultTime,
+                                    resultDataStr2, resultTime, resultTest, "", "", "", Integer.toString(DataHolder.getUserId()));
+                        }
+                        else {
+                            //首测不为空，update表中数据，但是要update表中修正数据
+                            xiuzhengTextEdit.setText(resultDataStr2);
+                            xiuzhengTimeTextEdit.setText(resultDataStr1);
+                            xiuzhengCheckbox.setChecked(true);
+                            xiuzhengResult.setText(resultDataStr3);
+                            String resultTest = "";
+                            if(resultDataStr3.equals("合格")) {
+                                resultTest = "0";
+                                xiuzhengResult.setTextColor(getResources().getColor(R.color.greenbutton));
+                            }
+                            else if(resultDataStr3.equals("超下限")) {
+                                resultTest = "1";
+                                xiuzhengResult.setTextColor(getResources().getColor(R.color.theme_default_primary));
+                            }
+                            else {
+                                resultTest = "2";
+                                xiuzhengResult.setTextColor(getResources().getColor(R.color.theme_default_primary));
+                            }
+                            String resultTime = resultDataStr4 + " " + resultDataStr1;
+                            m_MyDatabaseAdapter.updateTestDataTableBlueTooth(gVinCode, gPartCode, gongweiName, resultDataStr2,
+                                    resultTime, resultTest, resultTime);
+                        }
+                        TextView textView0 = (TextView)luosiLayout.findViewById(R.id.gongweimingchengtextview);
+                        TextView textView1 = (TextView)luosiLayout.findViewById(R.id.textview1);
+                        TextView textView2 = (TextView)luosiLayout.findViewById(R.id.textview2);
+                        TextView textView3 = (TextView)luosiLayout.findViewById(R.id.textview3);
+                        TextView textView4 = (TextView)luosiLayout.findViewById(R.id.textview4);
+                        //TextView textView5 = (TextView)luosiLayout.findViewById(R.id.shouceresult);
+                        //TextView textView6 = (TextView)luosiLayout.findViewById(R.id.xiuzhengresult);
+
+
+                        EditText editText1 = (EditText)luosiLayout.findViewById(R.id.shoucetextedit);
+                        EditText editText2 = (EditText)luosiLayout.findViewById(R.id.shoucetimetextedit);
+                        EditText editText3 = (EditText)luosiLayout.findViewById(R.id.xiuzhengtextedit);
+                        EditText editText4 = (EditText)luosiLayout.findViewById(R.id.xiuzhengtimetextedit);
+
+                        textView0.setTextColor(getResources().getColor(R.color.hint));
+                        textView1.setTextColor(getResources().getColor(R.color.hint));
+                        textView2.setTextColor(getResources().getColor(R.color.hint));
+                        textView3.setTextColor(getResources().getColor(R.color.hint));
+                        textView4.setTextColor(getResources().getColor(R.color.hint));
+                        //textView5.setTextColor(getResources().getColor(R.color.hint));
+                        //textView6.setTextColor(getResources().getColor(R.color.hint));
+                        editText1.setTextColor(getResources().getColor(R.color.hint));
+                        editText2.setTextColor(getResources().getColor(R.color.hint));
+                        editText3.setTextColor(getResources().getColor(R.color.hint));
+                        editText4.setTextColor(getResources().getColor(R.color.hint));
+                        //
+                        int bremoveed = gonweiNeededToBeTestList.indexOf(i);
+                        gonweiNeededToBeTestList.remove(bremoveed);
+                        break;
+                    }
+                }
+            }
+/*            for(int i = 0; i < gonweiNeededToBeTestList.size(); i++) {
+                int neededToBeTestIndex = gonweiNeededToBeTestList.get(i);
+                int ddddd = neededToBeTestIndex;
+            }
             if(clickedIndex != -1) {
                 LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 LinearLayout thirdStepLiearlayout = (LinearLayout)thirdStepLayout.findViewById(R.id.thirdchildlayout);
@@ -1562,13 +2155,13 @@ public class ScanChassisActivity extends Activity {
                     }
                 }
                 //移动到下一个
-                clickedIndex++;
+                /*clickedIndex++;
                 if(clickedIndex <= thirdStepLiearlayout.getChildCount() - 1) {
                     LinearLayout luosiLayout = (LinearLayout)thirdStepLiearlayout.getChildAt(clickedIndex);
                     ImageButton nextImageButton = (ImageButton)luosiLayout.findViewById(R.id.luoshuanbutton);
                     nextImageButton.performClick();
-                }
-            }
+                }*/
+//            }
         }
     }
 
