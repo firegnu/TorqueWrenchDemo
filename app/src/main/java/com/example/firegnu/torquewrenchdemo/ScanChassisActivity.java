@@ -1453,6 +1453,8 @@ public class ScanChassisActivity extends Activity {
     }
 
     protected void rceiveData(String stringExtra) {
+        //开始分别处理同步时间、零件数据同步、以及通过扳手发送过来的扭矩数据的解析
+        ///////////////////////////////////////////////////////////////
         Log.d(TAG, stringExtra);
         if (stringExtra != null) {
             /*Toast.makeText(ScanChassisActivity.this, stringExtra,
