@@ -218,6 +218,24 @@ public class LoginActivity extends Activity {
         if(lastSyncTime.equals("")) {
             loginButton.setText("与服务器同步数据");
         }
+        //自动登陆
+        SharedPreferences userName = getApplicationContext().getSharedPreferences("userName", 0);
+        String strUserName = userName.getString("userName", "");
+
+        SharedPreferences userPassword = getApplicationContext().getSharedPreferences("userPassword", 0);
+        String strUserPassword = userPassword.getString("userPassword", "");
+        if(!strUserName.equals("") && !strUserPassword.equals("")) {
+
+            DataHolder.setServerAddress("http://" + serverAddress);
+            DataHolder.setUserName(nameList.get(userIndex));
+            DataHolder.setUserId(idList.get(userIndex));
+            DataHolder.setUserPassword(strUserPassword);
+            DataHolder.setUserType(typeList.get(userIndex));
+
+            Intent intent = new Intent(LoginActivity.this, ScanChassisActivity.class);
+            startActivity(intent);
+            finish();
+        }
     }
 
     //set default value
@@ -293,7 +311,6 @@ public class LoginActivity extends Activity {
     }
 
     public void attempLogin() {
-
         SharedPreferences settings = getApplicationContext().getSharedPreferences("serveraddress", 0);
         String serverAddress = settings.getString("serveraddress", "");
 
@@ -338,6 +355,17 @@ public class LoginActivity extends Activity {
                         asyncDataFromServer();
                     }
                     else {
+                        //记录此时登陆的用户名和密码
+                        SharedPreferences userName = getApplicationContext().getSharedPreferences("userName", 0);
+                        SharedPreferences.Editor editorUserName = userName.edit();
+                        editorUserName.putString("userName", nameList.get(userIndex));
+                        editorUserName.apply();
+
+                        SharedPreferences userPassword = getApplicationContext().getSharedPreferences("userPassword", 0);
+                        SharedPreferences.Editor editorUserPassword = userPassword.edit();
+                        editorUserPassword.putString("userPassword", password);
+                        editorUserPassword.apply();
+
                         Intent intent = new Intent(LoginActivity.this, ScanChassisActivity.class);
                         startActivity(intent);
                         finish();

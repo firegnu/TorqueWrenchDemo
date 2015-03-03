@@ -88,6 +88,17 @@ public class Settings extends Activity {
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //此时将SharedPreferences中username和password清空
+                SharedPreferences userName = getApplicationContext().getSharedPreferences("userName", 0);
+                SharedPreferences.Editor editorUserName = userName.edit();
+                editorUserName.putString("userName", "");
+                editorUserName.apply();
+
+                SharedPreferences userPassword = getApplicationContext().getSharedPreferences("userPassword", 0);
+                SharedPreferences.Editor editorUserPassword = userPassword.edit();
+                editorUserPassword.putString("userPassword", "");
+                editorUserPassword.apply();
+
                 logout();
             }
         });
@@ -151,6 +162,16 @@ public class Settings extends Activity {
                 editorBanshouName.apply();
                 if(arg2 != groupIdSelected) {
                     //String selectedPerson = adapterBoltType.getItem(arg2);
+                    //此时将SharedPreferences中username和password清空
+                    SharedPreferences userName = getApplicationContext().getSharedPreferences("userName", 0);
+                    SharedPreferences.Editor editorUserName = userName.edit();
+                    editorUserName.putString("userName", "");
+                    editorUserName.apply();
+
+                    SharedPreferences userPassword = getApplicationContext().getSharedPreferences("userPassword", 0);
+                    SharedPreferences.Editor editorUserPassword = userPassword.edit();
+                    editorUserPassword.putString("userPassword", "");
+                    editorUserPassword.apply();
                     logout();
                 }
 
@@ -591,6 +612,11 @@ public class Settings extends Activity {
         SharedPreferences.Editor editorBanshouName = banshouName.edit();
         editorBanshouName.putString("banshouName", saveBanshouEdit.getText().toString());
         editorBanshouName.apply();
+
+        Toast toast = Toast.makeText(getApplicationContext(),
+                "扳手ID修改成功!", Toast.LENGTH_LONG);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
     }
 
     public void saveBanshouWatchTime() {
@@ -599,6 +625,11 @@ public class Settings extends Activity {
         SharedPreferences.Editor editorBanshouWatchTime = banshouWatchTime.edit();
         editorBanshouWatchTime.putString("banshouWatchTime", banshouWatchTimeEdit.getText().toString());
         editorBanshouWatchTime.apply();
+
+        Toast toast = Toast.makeText(getApplicationContext(),
+                "扳手监测时间修改成功!", Toast.LENGTH_LONG);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
     }
 
     public void saveDataWatchTime() {
@@ -607,6 +638,11 @@ public class Settings extends Activity {
         SharedPreferences.Editor editorDataWatchTime = dataWatchTime.edit();
         editorDataWatchTime.putString("dataWatchTime", dataWatchTimeEdit.getText().toString());
         editorDataWatchTime.apply();
+
+        Toast toast = Toast.makeText(getApplicationContext(),
+                "数据同步周期修改成功!", Toast.LENGTH_LONG);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
     }
 
     public void saveAutoRefreshSwitch(Boolean bChecked) {
@@ -689,6 +725,12 @@ public class Settings extends Activity {
         else{
             //modify user password
             Boolean bModifyUserPassword = m_MyDatabaseAdapter.updateUserPassword(newPassword, DataHolder.getUserId());
+            //修改prefrase中的password
+            SharedPreferences userPassword = getApplicationContext().getSharedPreferences("userPassword", 0);
+            SharedPreferences.Editor editorUserPassword = userPassword.edit();
+            editorUserPassword.putString("userPassword", newPassword);
+            editorUserPassword.apply();
+            //
             if(bModifyUserPassword) {
                 new ModifyServerPassword().execute();
             }
