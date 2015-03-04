@@ -98,6 +98,8 @@ public class ScanChassisActivity extends Activity {
     private String resultDataStr4 = "";
 
     int clickedIndex = -1;
+    final List<Float> resultControlMinList = new ArrayList<Float>();
+    final List<Float> resultControlMaxList = new ArrayList<Float>();
     private List<Integer> gonweiNeededToBeTestList = new ArrayList<Integer>();
 
     private View mProgressView;
@@ -402,6 +404,8 @@ public class ScanChassisActivity extends Activity {
                 final List<Float> controlMinList = new ArrayList<Float>();
                 final List<Float> controlMaxList = new ArrayList<Float>();
                 final List<String> workmanShipList = new ArrayList<String>();
+                resultControlMinList.clear();
+                resultControlMaxList.clear();
                 if (cur != null) {
                     if (cur.moveToFirst()) {
                         do {
@@ -422,6 +426,10 @@ public class ScanChassisActivity extends Activity {
                             controlMaxList.add(controlMax);
                             workmanShip = cur.getString(8);
                             workmanShipList.add(workmanShip);
+                            for(int i = 0; i < boltNum; i++) {
+                                resultControlMinList.add(controlMin);
+                                resultControlMaxList.add(controlMax);
+                            }
                         } while (cur.moveToNext());
                     }
                     cur.close();
@@ -614,7 +622,6 @@ public class ScanChassisActivity extends Activity {
                         gongweiButton.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                //其他的变灰
                                 LinearLayout luosiLayoutButton = (LinearLayout)view.getParent().getParent();
                                 clickedIndex = (int)luosiLayoutButton.getTag();
                                 LinearLayout thirdStepLiearlayout = (LinearLayout)thirdStepLayout.findViewById(R.id.thirdchildlayout);
@@ -1032,6 +1039,7 @@ public class ScanChassisActivity extends Activity {
             resultDataStr2 = map.get("实测值");
             resultDataStr3 = map.get("结论");
             resultDataStr4 = map.get("日期");
+            float testResultFromBtDevice = Float.parseFloat(resultDataStr2);
             Iterator<String> it = map.keySet().iterator();
             //
             if(gonweiNeededToBeTestList.size() > 0) {
@@ -1060,15 +1068,17 @@ public class ScanChassisActivity extends Activity {
                             shouceCheckbox.setChecked(true);
                             shouceResult.setText(resultDataStr3);
                             String resultTest = "";
-                            if(resultDataStr3.equals("合格")) {
+                            //if(resultDataStr3.equals("合格")) {
+                            if(testResultFromBtDevice <= resultControlMaxList.get(i) && testResultFromBtDevice >= resultControlMinList.get(i)) {
                                 resultTest = "0";
                                 shouceResult.setTextColor(getResources().getColor(R.color.greenbutton));
                             }
-                            else if(resultDataStr3.equals("超下限")) {
+                            //else if(resultDataStr3.equals("超下限")) {
+                            else if(testResultFromBtDevice < resultControlMinList.get(i)) {
                                 resultTest = "1";
                                 shouceResult.setTextColor(getResources().getColor(R.color.theme_default_primary));
                             }
-                            else {
+                            else if(testResultFromBtDevice >= resultControlMaxList.get(i)) {
                                 resultTest = "2";
                                 shouceResult.setTextColor(getResources().getColor(R.color.theme_default_primary));
                             }
@@ -1083,15 +1093,17 @@ public class ScanChassisActivity extends Activity {
                             xiuzhengCheckbox.setChecked(true);
                             xiuzhengResult.setText(resultDataStr3);
                             String resultTest = "";
-                            if(resultDataStr3.equals("合格")) {
+                            //if(resultDataStr3.equals("合格")) {
+                            if(testResultFromBtDevice <= resultControlMaxList.get(i) && testResultFromBtDevice >= resultControlMinList.get(i)) {
                                 resultTest = "0";
                                 xiuzhengResult.setTextColor(getResources().getColor(R.color.greenbutton));
                             }
-                            else if(resultDataStr3.equals("超下限")) {
+                            //else if(resultDataStr3.equals("超下限")) {
+                            else if(testResultFromBtDevice < resultControlMinList.get(i)) {
                                 resultTest = "1";
                                 xiuzhengResult.setTextColor(getResources().getColor(R.color.theme_default_primary));
                             }
-                            else {
+                            else if(testResultFromBtDevice >= resultControlMaxList.get(i)) {
                                 resultTest = "2";
                                 xiuzhengResult.setTextColor(getResources().getColor(R.color.theme_default_primary));
                             }
