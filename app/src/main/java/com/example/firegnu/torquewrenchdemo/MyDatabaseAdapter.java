@@ -229,15 +229,16 @@ public class MyDatabaseAdapter {
 
     //insert data to bomstruct table
     public long insertBomStructTable(String model, String partNo, String boltType, String partName,
-                                     String standardValue, String valueRange, String limitRange, String workmanship, String boltNum) {
+                                     String standardMin, String standardMax, String controlMin, String controlMax ,String workmanship, String boltNum) {
         ContentValues init = new ContentValues();
         init.put("model", model);
         init.put("partNo", partNo);
         init.put("boltType", boltType);
         init.put("partName", partName);
-        init.put("standardValue", standardValue);
-        init.put("valueRange", valueRange);
-        init.put("limitRange", limitRange);
+        init.put("standardMin", standardMin);
+        init.put("standardMax", standardMax);
+        init.put("controlMin", controlMin);
+        init.put("controlMax", controlMax);
         init.put("workmanship", workmanship);
         init.put("boltNum", boltNum);
         return mSqLiteDatabase.insert(T_BOMSTRUCT, null, init);

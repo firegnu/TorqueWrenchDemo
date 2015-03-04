@@ -88,12 +88,31 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="工艺标准: "
+                android:text="标准范围: "
                 android:layout_gravity="center"
                 android:textColor="@android:color/black">
             </TextView>
             <EditText
-                android:id="@+id/stardardvalue"
+                android:id="@+id/stardardmin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="32"
+                android:background="@drawable/textedit_style"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:editable="false"
+                android:paddingLeft="5dp"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="-----"
+                android:layout_gravity="center"
+                android:textColor="@android:color/black">
+            </TextView>
+            <EditText
+                android:id="@+id/stardardmax"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -118,7 +137,26 @@
                 android:textColor="@android:color/black">
             </TextView>
             <EditText
-                android:id="@+id/valueRange"
+                android:id="@+id/controlMin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="32"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:editable="false"
+                android:background="@drawable/textedit_style"
+                android:paddingLeft="5dp"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="-----"
+                android:layout_gravity="center"
+                android:textColor="@android:color/black">
+            </TextView>
+            <EditText
+                android:id="@+id/controlMax"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -134,7 +172,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginBottom="10dp">
+            android:layout_marginBottom="10dp"
+            android:visibility="gone">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

@@ -264,6 +264,8 @@ public class ScanChassisActivity extends Activity {
                 integrator.initiateScan();*/
                 final EditText firstResult = (EditText)findViewById(R.id.firstscanresulttextview);
                 firstResult.setText("");
+                EditText firstResultSuccessful = (EditText)findViewById(R.id.firstresultsuccesful);
+                firstResultSuccessful.setText("");
             }
         });
 
@@ -279,6 +281,8 @@ public class ScanChassisActivity extends Activity {
                 integrator.initiateScan();*/
                 final EditText sencondResult = (EditText)findViewById(R.id.sencondscanresulttextview);
                 sencondResult.setText("");
+                EditText sencondResultSuccessful = (EditText)findViewById(R.id.sencondResultSuccessful);
+                sencondResultSuccessful.setText("");
             }
         });
 
@@ -479,9 +483,10 @@ public class ScanChassisActivity extends Activity {
                 String partName = "";
                 String boltType = "";
                 int boltNum = 0;
-                float stardardValue = 0;
-                float valueRange = 0;
-                float limitRange = 0;
+                float standardMin = 0;
+                float standardMax = 0;
+                float controlMin = 0;
+                float controlMax = 0;
                 String workmanShip = "";
                 //
                 final LinearLayout sencondResultLayout = (LinearLayout) layoutInflater.inflate(R.layout.sencondscanresult, null);
@@ -491,21 +496,24 @@ public class ScanChassisActivity extends Activity {
                 //sencondBoldType.setText("");
                 final EditText sencondBoldNum = (EditText)sencondResultLayout.findViewById(R.id.boldnum);
                 sencondBoldNum.setText("");
-                final EditText sencondStardardValue = (EditText)sencondResultLayout.findViewById(R.id.stardardvalue);
-                sencondStardardValue.setText("");
-                final EditText sencondValueRange = (EditText)sencondResultLayout.findViewById(R.id.valueRange);
-                sencondValueRange.setText("");
-                final EditText sencondLimitRange = (EditText)sencondResultLayout.findViewById(R.id.limitrange);
-                sencondLimitRange.setText("");
+                final EditText sencondStardardMin = (EditText)sencondResultLayout.findViewById(R.id.stardardmin);
+                sencondStardardMin.setText("");
+                final EditText sencondStardardMax = (EditText)sencondResultLayout.findViewById(R.id.stardardmax);
+                sencondStardardMax.setText("");
+                final EditText sencondcontrolMin = (EditText)sencondResultLayout.findViewById(R.id.controlMin);
+                sencondcontrolMin.setText("");
+                final EditText sencondcontrolMax = (EditText)sencondResultLayout.findViewById(R.id.controlMax);
+                sencondcontrolMax.setText("");
                 final EditText sencondWorkManShip = (EditText)sencondResultLayout.findViewById(R.id.workmanship);
                 sencondWorkManShip.setText("");
 
                 final List<String> listBoltType = new ArrayList<String>();
                 final List<String> partNameList = new ArrayList<String>();
                 final List<Integer> boltNumList = new ArrayList<Integer>();
-                final List<Float> stardardValueList = new ArrayList<Float>();
-                final List<Float> valueRangeList = new ArrayList<Float>();
-                final List<Float> limitRangeList = new ArrayList<Float>();
+                final List<Float> standardMinList = new ArrayList<Float>();
+                final List<Float> standardMaxList = new ArrayList<Float>();
+                final List<Float> controlMinList = new ArrayList<Float>();
+                final List<Float> controlMaxList = new ArrayList<Float>();
                 final List<String> workmanShipList = new ArrayList<String>();
                 if (cur != null) {
                     if (cur.moveToFirst()) {
@@ -515,15 +523,17 @@ public class ScanChassisActivity extends Activity {
                             partNameList.add(partName);
                             boltType = cur.getString(2);
                             listBoltType.add(boltType);
-                            boltNum = cur.getInt(8);
+                            boltNum = cur.getInt(9);
                             boltNumList.add(boltNum);
-                            stardardValue = cur.getFloat(4);
-                            stardardValueList.add(stardardValue);
-                            valueRange = cur.getFloat(5);
-                            valueRangeList.add(valueRange);
-                            limitRange = cur.getFloat(6);
-                            limitRangeList.add(limitRange);
-                            workmanShip = cur.getString(7);
+                            standardMin = cur.getFloat(4);
+                            standardMinList.add(standardMin);
+                            standardMax = cur.getFloat(5);
+                            standardMaxList.add(standardMax);
+                            controlMin = cur.getFloat(6);
+                            controlMinList.add(controlMin);
+                            controlMax = cur.getFloat(7);
+                            controlMaxList.add(controlMax);
+                            workmanShip = cur.getString(8);
                             workmanShipList.add(workmanShip);
                         } while (cur.moveToNext());
                     }
@@ -550,9 +560,10 @@ public class ScanChassisActivity extends Activity {
                             //selectedPerson = adapterBoltType.getItem(arg2);
                             sencondPartName.setText(partNameList.get(arg2));
                             sencondBoldNum.setText(Integer.toString(boltNumList.get(arg2)));
-                            sencondStardardValue.setText(Float.toString(stardardValueList.get(arg2)));
-                            sencondValueRange.setText(Float.toString(valueRangeList.get(arg2)));
-                            sencondLimitRange.setText(Float.toString(limitRangeList.get(arg2)));
+                            sencondStardardMin.setText(Float.toString(standardMinList.get(arg2)));
+                            sencondStardardMax.setText(Float.toString(standardMaxList.get(arg2)));
+                            sencondcontrolMin.setText(Float.toString(controlMinList.get(arg2)));
+                            sencondcontrolMax.setText(Float.toString(controlMaxList.get(arg2)));
                             sencondWorkManShip.setText(workmanShipList.get(arg2));
                             arg0.setVisibility(View.VISIBLE);
                         }
@@ -1172,7 +1183,7 @@ public class ScanChassisActivity extends Activity {
         }
     }
 
-    @Override
+/*    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
         if(result != null) {
@@ -1557,7 +1568,7 @@ public class ScanChassisActivity extends Activity {
                                             editText3.setTextColor(getResources().getColor(R.color.hint));
                                             editText4.setTextColor(getResources().getColor(R.color.hint));
                                         }*/
-                                    }
+/*                                    }
                                 }
                             });
                             /////
@@ -1567,7 +1578,7 @@ public class ScanChassisActivity extends Activity {
                             /*LinearLayout luosiLayout = (LinearLayout)thirdStepLiearlayout.getChildAt(0);
                             ImageButton firstImageButton = (ImageButton)luosiLayout.findViewById(R.id.luoshuanbutton);
                             firstImageButton.performClick();*/
-                        }
+/*                        }
                     }
                     else {
                         sencondResultSuccessful.setText("查询失败");
@@ -1579,7 +1590,7 @@ public class ScanChassisActivity extends Activity {
         else {
             super.onActivityResult(requestCode, resultCode, intent);
         }
-    }
+    }*/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -1863,7 +1874,8 @@ public class ScanChassisActivity extends Activity {
                     @Override
                     public void run() {
                         //发送时间同步
-                        sendData("C5 01 02 01 02 03");
+                        //sendData("C5 01 02 01 02 03");
+                        sendData("55 AA DD 0F 03 04 0C 23 22 5A 5A");
                     }
                 }, 1000);
 

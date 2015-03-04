@@ -625,13 +625,14 @@ public class LoginActivity extends Activity {
                     String partNo = bomStructData.getString("partNo");
                     String boltType = bomStructData.getString("boltType");
                     String partName = bomStructData.getString("partName");
-                    String standardValue = bomStructData.getString("standardValue");
-                    String valueRange = bomStructData.getString("valueRange");
-                    String limitRange = bomStructData.getString("limitRange");
+                    String standardMin = bomStructData.getString("standardMin");
+                    String standardMax = bomStructData.getString("standardMax");
+                    String controlMin = bomStructData.getString("controlMin");
+                    String controlMax = bomStructData.getString("controlMax");
                     String workmanship = bomStructData.getString("workmanship");
                     String boltNum = bomStructData.getString("boltNum");
                     m_MyDatabaseAdapter.insertBomStructTable(model, partNo, boltType, partName,
-                            standardValue, valueRange, limitRange, workmanship, boltNum);
+                            standardMin, standardMax, controlMin, controlMax, workmanship, boltNum);
                 }
                 //bomdata
                 JSONArray serverBomDataDataList = jsonObject.getJSONArray("serverBomData");
