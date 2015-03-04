@@ -1,6 +1,8 @@
 package com.example.firegnu.torquewrenchdemo;
 
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 /**
  * Created by firegnu on 15-1-29.
@@ -155,5 +157,32 @@ public class DataAnalysis {
 
 
         return map;
+    }
+
+    public static String strDeal(String str){
+        if(str.length()<2){
+            return "0" + str;
+        }
+        else if(str.length()>2){
+            return str.substring(str.length()-2, str.length());
+        }
+        else {
+            return str;
+        }
+    }
+
+    public static String adjustTime(){
+        SimpleDateFormat formatter = new SimpleDateFormat ("yyyy MM dd HH mm ss");
+        Date curDate = new Date(System.currentTimeMillis());
+        String str = formatter.format(curDate);
+        String array[] = str.split(" ");
+        String year = strDeal(Integer.toHexString(Integer.parseInt(array[0])%2000));
+        String month = strDeal(Integer.toHexString(Integer.parseInt(array[1])));
+        String day = strDeal(Integer.toHexString(Integer.parseInt(array[2])));
+        String hour = strDeal(Integer.toHexString(Integer.parseInt(array[3])));
+        String minute = strDeal(Integer.toHexString(Integer.parseInt(array[4])));
+        int checkSum = 221 + Integer.parseInt(array[0])%2000 + Integer.parseInt(array[1]) + Integer.parseInt(array[2]) + Integer.parseInt(array[3]) + Integer.parseInt(array[4]);
+        String checkByte = strDeal(Integer.toHexString(checkSum));
+        return "55aadd"+year+month+day+hour+minute+checkByte+"5a5a";
     }
 }

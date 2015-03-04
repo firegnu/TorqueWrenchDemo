@@ -514,10 +514,8 @@ public class LoginActivity extends Activity {
                     bUpdate = true;
                 }
             } catch (ClientProtocolException e) {
-                // TODO Auto-generated catch block
                 bUpdate = false;
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 bUpdate = false;
             }
         }
