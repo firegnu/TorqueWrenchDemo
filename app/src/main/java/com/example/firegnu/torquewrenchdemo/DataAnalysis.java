@@ -1,5 +1,6 @@
 package com.example.firegnu.torquewrenchdemo;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -171,6 +172,21 @@ public class DataAnalysis {
         }
     }
 
+    public static String strDeal1(String str){
+        if(str.length() == 1){
+            return "000" + str;
+        }
+        else if(str.length() == 2){
+            return "00" + str;
+        }
+        else if(str.length() == 3){
+            return "0" + str;
+        }
+        else{
+            return str;
+        }
+    }
+
     public static String adjustTime(){
         SimpleDateFormat formatter = new SimpleDateFormat ("yyyy MM dd HH mm ss");
         Date curDate = new Date(System.currentTimeMillis());
@@ -184,5 +200,59 @@ public class DataAnalysis {
         int checkSum = 221 + Integer.parseInt(array[0])%2000 + Integer.parseInt(array[1]) + Integer.parseInt(array[2]) + Integer.parseInt(array[3]) + Integer.parseInt(array[4]);
         String checkByte = strDeal(Integer.toHexString(checkSum));
         return "55aadd"+year+month+day+hour+minute+checkByte+"5a5a";
+    }
+
+    public static String sendTechnicsData(int num, float max, float min){
+        String dataNum = strDeal(Integer.toHexString(num));
+        int fIntMax = (int) max;
+        BigDecimal max1 = new BigDecimal(Float.toString(max));
+        BigDecimal max2 = new BigDecimal(Integer.toString(fIntMax));
+        float fPointMax = max1.subtract(max2).floatValue();
+
+        String max_fInt = Integer.toHexString(fIntMax);
+        String strMax = null;
+        if(fPointMax == 0.0){
+            strMax = strDeal1(max_fInt) + "05";
+        }
+        else if(max_fInt.length() == 1 && fIntMax == 0){
+            strMax = Integer.toHexString((int) fPointMax*16) + Integer.toHexString((int) (fPointMax - (int) fPointMax)*16) + Integer.toHexString((int) (fPointMax*16 - (int) fPointMax*16)*16) + Integer.toHexString((int) (fPointMax*16*16 - (int) fPointMax*16*16)*16) + "01";
+        }
+        else if(max_fInt.length() == 1 && fIntMax != 0){
+            strMax = max_fInt + Integer.toHexString((int) fPointMax*16) + Integer.toHexString((int) (fPointMax - (int) fPointMax)*16) + Integer.toHexString((int) (fPointMax*16 - (int) fPointMax*16)*16) + "02";
+        }
+        else if(max_fInt.length() == 2){
+            strMax = max_fInt + Integer.toHexString((int) fPointMax*16) + Integer.toHexString((int) (fPointMax - (int) fPointMax)*16) + "03";
+        }
+        else if(max_fInt.length() == 3){
+            strMax = max_fInt + Integer.toHexString((int) fPointMax*16) + "04";
+        }
+
+        int fIntMin = (int) min;
+        BigDecimal min1 = new BigDecimal(Float.toString(min));
+        BigDecimal min2 = new BigDecimal(Integer.toString(fIntMin));
+        float fPointMin = min1.subtract(min2).floatValue();
+
+        String min_fInt = Integer.toHexString(fIntMin);
+        String strMin = null;
+        if(fPointMin == 0){
+            strMin = strDeal1(min_fInt) + "05";
+        }
+        else if(min_fInt.length() == 1 && fIntMin == 0){
+            strMin = Integer.toHexString((int) fPointMin*16) + Integer.toHexString((int) (fPointMin - (int) fPointMin)*16) + Integer.toHexString((int) (fPointMin*16 - (int) fPointMin*16)*16) + Integer.toHexString((int) (fPointMin*16*16 - (int) fPointMin*16*16)*16) + "01";
+        }
+        else if(min_fInt.length() == 1 && fIntMin != 0){
+            strMin = min_fInt + Integer.toHexString((int) fPointMin*16) + Integer.toHexString((int) (fPointMin - (int) fPointMin)*16) + Integer.toHexString((int) (fPointMin*16 - (int) fPointMin*16)*16) + "02";
+        }
+        else if(min_fInt.length() == 2){
+            strMin = min_fInt + Integer.toHexString((int) fPointMin*16) + Integer.toHexString((int) (fPointMin - (int) fPointMin)*16) + "03";
+        }
+        else if(min_fInt.length() == 3){
+            strMin = min_fInt + Integer.toHexString((int) fPointMin*16) + "04";
+        }
+
+        int checkSum = 241 + num + Integer.valueOf(strMax.substring(0, 2),16) + Integer.valueOf(strMax.substring(2, 4),16) + Integer.valueOf(strMax.substring(4, 6),16) + Integer.valueOf(strMin.substring(0, 2),16) + Integer.valueOf(strMin.substring(2, 4),16) + Integer.valueOf(strMin.substring(4, 6),16);
+        String checkByte = strDeal(Integer.toHexString(checkSum));
+
+        return "55aaf1"+dataNum+strMax+strMin+checkByte+"5a5a";
     }
 }

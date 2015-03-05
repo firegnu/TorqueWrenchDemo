@@ -244,45 +244,17 @@ public class ScanChassisActivity extends Activity {
         firstScanButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final EditText firstResult = (EditText)findViewById(R.id.firstscanresulttextview);
+                /*final EditText firstResult = (EditText)findViewById(R.id.firstscanresulttextview);
                 firstResult.setText("");
                 EditText firstResultSuccessful = (EditText)findViewById(R.id.firstresultsuccesful);
-                firstResultSuccessful.setText("");
-            }
-        });
-
-        ImageButton sencondScanButton = (ImageButton) findViewById(R.id.sencondscanbutton);
-        sencondScanButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                final EditText sencondResult = (EditText)findViewById(R.id.sencondscanresulttextview);
-                sencondResult.setText("");
-                EditText sencondResultSuccessful = (EditText)findViewById(R.id.sencondResultSuccessful);
-                sencondResultSuccessful.setText("");
-            }
-        });
-
-        final EditText firstResult = (EditText)findViewById(R.id.firstscanresulttextview);
-        //scan finished
-        firstResult.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
+                firstResultSuccessful.setText("");*/
+                final EditText firstResult = (EditText)findViewById(R.id.firstscanresulttextview);
                 LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 LinearLayout firstStepLiearlayout = (LinearLayout)firstStepLayout.findViewById(R.id.firstchildlayout);
                 firstStepLiearlayout.removeAllViews();
                 //
-                String carMode = m_MyDatabaseAdapter.getInfoFromVinCode("'" + s.toString() + "'");//'E52581'
-                gVinCode = s.toString();
+                String carMode = m_MyDatabaseAdapter.getInfoFromVinCode("'" + firstResult.getText().toString() + "'");//'E52581'
+                gVinCode = firstResult.getText().toString().toString();
                 if(!carMode.equals("")) {
                     gCarMode = carMode;
                     EditText firstResultSuccessful = (EditText)findViewById(R.id.firstresultsuccesful);
@@ -335,24 +307,17 @@ public class ScanChassisActivity extends Activity {
                 thirdStepLiearlayout.removeAllViews();
             }
         });
-        //
-        //sencond
-        final EditText sencondResult = (EditText)findViewById(R.id.sencondscanresulttextview);
-        sencondResult.addTextChangedListener(new TextWatcher() {
+
+        ImageButton sencondScanButton = (ImageButton) findViewById(R.id.sencondscanbutton);
+        sencondScanButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-                gPartCode = s.toString();
+            public void onClick(View view) {
+                /*final EditText sencondResult = (EditText)findViewById(R.id.sencondscanresulttextview);
+                sencondResult.setText("");
+                EditText sencondResultSuccessful = (EditText)findViewById(R.id.sencondResultSuccessful);
+                sencondResultSuccessful.setText("");*/
+                final EditText sencondResult = (EditText)findViewById(R.id.sencondscanresulttextview);
+                gPartCode = sencondResult.getText().toString();
                 /////
                 final LinearLayout sencondLayout = (LinearLayout)findViewById(R.id.sencondscanresult);
                 sencondLayout.removeAllViews();
@@ -362,7 +327,7 @@ public class ScanChassisActivity extends Activity {
                 EditText sencondResultSuccessful = (EditText)findViewById(R.id.sencondResultSuccessful);
                 //sencondstep layout add test data
                 //String partCode, String vinCode, String model
-                Cursor cur = m_MyDatabaseAdapter.getPartInfoFromPartNo("'" + s.toString() + "'",
+                Cursor cur = m_MyDatabaseAdapter.getPartInfoFromPartNo("'" + sencondResult.getText().toString() + "'",
                         "'" + gVinCode + "'", "'" + gCarMode + "'");//
                 Boolean bQuery = false;
                 String partName = "";
@@ -433,8 +398,8 @@ public class ScanChassisActivity extends Activity {
                 if(bQuery) {
                     sencondResultSuccessful.setText("查询成功");
                     gonweiNeededToBeTestList.clear();
-                    //todo:发送零件控制参数等相关信息
-                    sendData("C5 01 02 01 02 03");
+                    String btDevicePara = DataAnalysis.sendTechnicsData(boltNumList.size(), controlMinList.get(0), controlMaxList.get(0));
+                    sendData(btDevicePara);
                     LinearLayout.LayoutParams lpsencondResult = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
                     lpsencondResult.setMargins(0, 0,
                             0, 10);
@@ -668,6 +633,50 @@ public class ScanChassisActivity extends Activity {
                 else {
                     sencondResultSuccessful.setText("查询失败");
                 }
+            }
+        });
+
+        final EditText firstResult = (EditText)findViewById(R.id.firstscanresulttextview);
+        //scan finished
+        firstResult.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                LinearLayout firstStepLiearlayout = (LinearLayout)firstStepLayout.findViewById(R.id.firstchildlayout);
+                firstStepLiearlayout.removeAllViews();
+                EditText firstResultSuccessful = (EditText)findViewById(R.id.firstresultsuccesful);
+                firstResultSuccessful.setText("");
+            }
+        });
+        //
+        //sencond
+        final EditText sencondResult = (EditText)findViewById(R.id.sencondscanresulttextview);
+        sencondResult.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                final LinearLayout sencondLayout = (LinearLayout)findViewById(R.id.sencondscanresult);
+                sencondLayout.removeAllViews();
+                EditText sencondResultSuccessful = (EditText)findViewById(R.id.sencondResultSuccessful);
+                sencondResultSuccessful.setText("");
             }
         });
     }
