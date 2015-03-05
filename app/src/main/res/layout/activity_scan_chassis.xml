@@ -314,6 +314,18 @@
             android:orientation="vertical"
             android:visibility="gone"
             >
+            <Button
+                android:id="@+id/starttestdatabutton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="开始检测"
+                android:textColor="#fff"
+                android:background="@drawable/loginbutton_rect_list_normal"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:enabled="false"
+                >
+            </Button>
            <ScrollView android:id="@+id/third_login_form" android:layout_width="match_parent"
                     android:layout_height="match_parent">
                <LinearLayout

@@ -312,10 +312,10 @@ public class MyDatabaseAdapter {
 
 
 
-    public Cursor getGongweiCount(String partCode, String vinCode) {
+    public Cursor getGongweiCount(String partCode, String vinCode, String boltType) {
         //select partStation, boltType from torquewrench.bomdata where partCode = 'E52581-P001' and vinCode = 'E52581';
         //String sqlStr = "select partStation from " + T_BOMDATA + " where partCode = " + "'E52581-P001' and vinCode = " + "'E52581' " + "order by id";
-        String sqlStr = "select partStation from " + T_BOMDATA + " where partCode = " + partCode + " and vinCode = " + vinCode + " order by id";
+        String sqlStr = "select partStation from " + T_BOMDATA + " where partCode = " + partCode + " and vinCode = " + vinCode + " and boltType = " + boltType + " order by id";
         Cursor cursor = mSqLiteDatabase.rawQuery(sqlStr, null);
         return cursor;
     }
