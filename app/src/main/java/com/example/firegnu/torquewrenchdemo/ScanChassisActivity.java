@@ -447,6 +447,7 @@ public class ScanChassisActivity extends Activity {
                                 }
                                 thirdCur.close();
                             }
+                            int blackGongweiCount = 0;
                             for(int i = 0; i < gongweiCount; i++) {
                                 final LinearLayout luosiLayout = (LinearLayout) layoutInflater.inflate(R.layout.test_torque_wrench, null);
                                 LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
@@ -566,6 +567,7 @@ public class ScanChassisActivity extends Activity {
                                         if(!gonweiNeededToBeTestList.contains(i)) {
                                             gonweiNeededToBeTestList.add(i);
                                             startTestDataButton.setEnabled(true);
+                                            blackGongweiCount++;
                                         }
                                     }
                                     testCorqueDataCur.close();
@@ -621,6 +623,9 @@ public class ScanChassisActivity extends Activity {
                                         }
                                     }
                                 });
+                            }
+                            if(blackGongweiCount == 0) {
+                                startTestDataButton.setEnabled(false);
                             }
                             //////////////////////////////////////////
                             //////////////////////////////////////////
