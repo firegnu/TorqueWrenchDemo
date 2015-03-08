@@ -113,6 +113,9 @@ public class ScanChassisActivity extends Activity {
 
     Button startTestDataButton;
 
+    int recievedDataIndex = 0;
+    int testDataCount = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -709,9 +712,13 @@ public class ScanChassisActivity extends Activity {
             @Override
             public void onClick(View v) {
                 //与蓝牙设备同步参数
-                String btDevicePara = DataAnalysis.sendTechnicsData(gonweiNeededToBeTestList.size(), controlMinValue, controlMaxValue);
+                String btDevicePara = DataAnalysis.sendTechnicsData(gonweiNeededToBeTestList.size(), controlMaxValue, controlMinValue);
                 if(gonweiNeededToBeTestList.size() > 0) {
-                    sendData(btDevicePara);
+                    //todo: hard code
+                    //收到数据初始化
+                    testDataCount = gonweiNeededToBeTestList.size();
+                    recievedDataIndex = 0;
+                    sendData(btDevicePara);//55 AA F1 03 16 D3 05 14 14 05 09 5A 5A
                 }
             }
         });
@@ -1001,7 +1008,8 @@ public class ScanChassisActivity extends Activity {
                     @Override
                     public void run() {
                         String adjustTimerToBtDevice = DataAnalysis.adjustTime();
-                        sendData(adjustTimerToBtDevice);
+                        //todo: hard code
+                        sendData(adjustTimerToBtDevice);//55 AA DD 0F 03 07 16 02 0E 5A 5A
                     }
                 }, 1000);
 
@@ -1079,121 +1087,138 @@ public class ScanChassisActivity extends Activity {
             }
             //解析接收接收扭矩扳手发送过来的数据
             else {
-                HashMap<String,String> map = new HashMap<String,String>();
-                String ReceiveData = stringExtra;
-                map = DataAnalysis.toData(ReceiveData);
-                resultDataStr1 = map.get("时间");
-                resultDataStr2 = map.get("实测值");
-                resultDataStr3 = map.get("结论");
-                resultDataStr4 = map.get("日期");
-                float testResultFromBtDevice = Float.parseFloat(resultDataStr2);
-                Iterator<String> it = map.keySet().iterator();
-                //
-                if(gonweiNeededToBeTestList.size() > 0) {
-                    LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                    LinearLayout thirdStepLiearlayout = (LinearLayout)thirdStepLayout.findViewById(R.id.thirdchildlayout);
-                    for(int i = 0; i < thirdStepLiearlayout.getChildCount(); i++) {
-                        if(gonweiNeededToBeTestList.contains(i)) {
-                            //
-                            LinearLayout luosiLayout = (LinearLayout)thirdStepLiearlayout.getChildAt(i);
-                            EditText shouceTextEdit = (EditText)luosiLayout.findViewById(R.id.shoucetextedit);
-                            EditText shouceTimeTextEdit = (EditText)luosiLayout.findViewById(R.id.shoucetimetextedit);
-                            CheckBox shouceCheckbox = (CheckBox)luosiLayout.findViewById(R.id.shoucecheckbox);
-                            TextView shouceResult = (TextView)luosiLayout.findViewById(R.id.shouceresult);
 
-                            EditText xiuzhengTextEdit = (EditText)luosiLayout.findViewById(R.id.xiuzhengtextedit);
-                            EditText xiuzhengTimeTextEdit = (EditText)luosiLayout.findViewById(R.id.xiuzhengtimetextedit);
-                            CheckBox xiuzhengCheckbox = (CheckBox)luosiLayout.findViewById(R.id.xiuzhengcheckbox);
-                            TextView xiuzhengResult = (TextView)luosiLayout.findViewById(R.id.xiuzhengresult);
 
-                            TextView gongweiNameTextView = (TextView)luosiLayout.findViewById(R.id.gongweimingchengtextview);
-                            String gongweiName = gongweiNameTextView.getText().toString();
-                            if(shouceTextEdit.getText().toString().equals("")) {
-                                //首测为空直接插入表中首测数据
-                                shouceTextEdit.setText(resultDataStr2);
-                                shouceTimeTextEdit.setText(resultDataStr1);
-                                shouceCheckbox.setChecked(true);
-                                shouceResult.setText(resultDataStr3);
-                                String resultTest = "";
-                                //if(resultDataStr3.equals("合格")) {
-                                if(testResultFromBtDevice <= controlMaxValue && testResultFromBtDevice >= controlMinValue) {
-                                    resultTest = "0";
-                                    shouceResult.setTextColor(getResources().getColor(R.color.greenbutton));
+                //else {
+                    if(recievedDataIndex == (testDataCount - 1) ) {
+                        //发送清空指令
+                        sendData("55 AA 50 43 4C 44 54 00 00 00 77 5A 5A");
+                        //
+                    }
+                    HashMap<String,String> map = new HashMap<String,String>();
+                    String ReceiveData = stringExtra;
+                    map = DataAnalysis.toData(ReceiveData);
+                    resultDataStr1 = map.get("时间");
+                    resultDataStr2 = map.get("实测值");
+                    resultDataStr3 = map.get("结论");
+                    resultDataStr4 = map.get("日期");
+                    float testResultFromBtDevice = Float.parseFloat(resultDataStr2);
+                    Iterator<String> it = map.keySet().iterator();
+                    //
+                    if(gonweiNeededToBeTestList.size() > 0) {
+                        LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                        LinearLayout thirdStepLiearlayout = (LinearLayout)thirdStepLayout.findViewById(R.id.thirdchildlayout);
+                        for(int i = 0; i < thirdStepLiearlayout.getChildCount(); i++) {
+                            if(gonweiNeededToBeTestList.contains(i)) {
+                                //
+                                LinearLayout luosiLayout = (LinearLayout)thirdStepLiearlayout.getChildAt(i);
+                                EditText shouceTextEdit = (EditText)luosiLayout.findViewById(R.id.shoucetextedit);
+                                EditText shouceTimeTextEdit = (EditText)luosiLayout.findViewById(R.id.shoucetimetextedit);
+                                CheckBox shouceCheckbox = (CheckBox)luosiLayout.findViewById(R.id.shoucecheckbox);
+                                TextView shouceResult = (TextView)luosiLayout.findViewById(R.id.shouceresult);
+
+                                EditText xiuzhengTextEdit = (EditText)luosiLayout.findViewById(R.id.xiuzhengtextedit);
+                                EditText xiuzhengTimeTextEdit = (EditText)luosiLayout.findViewById(R.id.xiuzhengtimetextedit);
+                                CheckBox xiuzhengCheckbox = (CheckBox)luosiLayout.findViewById(R.id.xiuzhengcheckbox);
+                                TextView xiuzhengResult = (TextView)luosiLayout.findViewById(R.id.xiuzhengresult);
+
+                                TextView gongweiNameTextView = (TextView)luosiLayout.findViewById(R.id.gongweimingchengtextview);
+                                String gongweiName = gongweiNameTextView.getText().toString();
+                                if(shouceTextEdit.getText().toString().equals("")) {
+                                    //首测为空直接插入表中首测数据
+                                    shouceTextEdit.setText(resultDataStr2);
+                                    shouceTimeTextEdit.setText(resultDataStr1);
+                                    shouceCheckbox.setChecked(true);
+                                    //shouceResult.setText(resultDataStr3);
+                                    String resultTest = "";
+                                    //if(resultDataStr3.equals("合格")) {
+                                    if(testResultFromBtDevice <= controlMaxValue && testResultFromBtDevice >= controlMinValue) {
+                                        resultTest = "0";
+                                        shouceResult.setTextColor(getResources().getColor(R.color.greenbutton));
+                                        shouceResult.setText("合格");
+                                    }
+                                    //else if(resultDataStr3.equals("超下限")) {
+                                    else if(testResultFromBtDevice < controlMinValue) {
+                                        resultTest = "1";
+                                        shouceResult.setTextColor(getResources().getColor(R.color.theme_default_primary));
+                                        shouceResult.setText("超下限");
+                                    }
+                                    else if(testResultFromBtDevice >= controlMaxValue) {
+                                        resultTest = "2";
+                                        shouceResult.setTextColor(getResources().getColor(R.color.theme_default_primary));
+                                        shouceResult.setText("超上限");
+                                    }
+                                    String resultTime = resultDataStr4 + " " + resultDataStr1;
+                                    m_MyDatabaseAdapter.insertTestDataTableBlueTooth(gVinCode, gPartCode, gongweiName, resultTime,
+                                            resultDataStr2, resultTime, resultTest, "", "", "", Integer.toString(DataHolder.getUserId()));
                                 }
-                                //else if(resultDataStr3.equals("超下限")) {
-                                else if(testResultFromBtDevice < controlMinValue) {
-                                    resultTest = "1";
-                                    shouceResult.setTextColor(getResources().getColor(R.color.theme_default_primary));
+                                else {
+                                    //首测不为空，update表中数据，但是要update表中修正数据
+                                    xiuzhengTextEdit.setText(resultDataStr2);
+                                    xiuzhengTimeTextEdit.setText(resultDataStr1);
+                                    xiuzhengCheckbox.setChecked(true);
+                                    //xiuzhengResult.setText(resultDataStr3);
+                                    String resultTest = "";
+                                    //if(resultDataStr3.equals("合格")) {
+                                    if(testResultFromBtDevice <= controlMaxValue && testResultFromBtDevice >= controlMinValue) {
+                                        resultTest = "0";
+                                        xiuzhengResult.setTextColor(getResources().getColor(R.color.greenbutton));
+                                        xiuzhengResult.setText("合格");
+                                    }
+                                    //else if(resultDataStr3.equals("超下限")) {
+                                    else if(testResultFromBtDevice < controlMinValue) {
+                                        resultTest = "1";
+                                        xiuzhengResult.setTextColor(getResources().getColor(R.color.theme_default_primary));
+                                        xiuzhengResult.setText("超下限");
+                                    }
+                                    else if(testResultFromBtDevice >= controlMaxValue) {
+                                        resultTest = "2";
+                                        xiuzhengResult.setTextColor(getResources().getColor(R.color.theme_default_primary));
+                                        xiuzhengResult.setText("超上限");
+                                    }
+                                    String resultTime = resultDataStr4 + " " + resultDataStr1;
+                                    m_MyDatabaseAdapter.updateTestDataTableBlueTooth(gVinCode, gPartCode, gongweiName, resultDataStr2,
+                                            resultTime, resultTest, resultTime);
                                 }
-                                else if(testResultFromBtDevice >= controlMaxValue) {
-                                    resultTest = "2";
-                                    shouceResult.setTextColor(getResources().getColor(R.color.theme_default_primary));
+                                TextView textView0 = (TextView)luosiLayout.findViewById(R.id.gongweimingchengtextview);
+                                TextView textView1 = (TextView)luosiLayout.findViewById(R.id.textview1);
+                                TextView textView2 = (TextView)luosiLayout.findViewById(R.id.textview2);
+                                TextView textView3 = (TextView)luosiLayout.findViewById(R.id.textview3);
+                                TextView textView4 = (TextView)luosiLayout.findViewById(R.id.textview4);
+                                //TextView textView5 = (TextView)luosiLayout.findViewById(R.id.shouceresult);
+                                //TextView textView6 = (TextView)luosiLayout.findViewById(R.id.xiuzhengresult);
+
+
+                                EditText editText1 = (EditText)luosiLayout.findViewById(R.id.shoucetextedit);
+                                EditText editText2 = (EditText)luosiLayout.findViewById(R.id.shoucetimetextedit);
+                                EditText editText3 = (EditText)luosiLayout.findViewById(R.id.xiuzhengtextedit);
+                                EditText editText4 = (EditText)luosiLayout.findViewById(R.id.xiuzhengtimetextedit);
+
+                                textView0.setTextColor(getResources().getColor(R.color.hint));
+                                textView1.setTextColor(getResources().getColor(R.color.hint));
+                                textView2.setTextColor(getResources().getColor(R.color.hint));
+                                textView3.setTextColor(getResources().getColor(R.color.hint));
+                                textView4.setTextColor(getResources().getColor(R.color.hint));
+                                //textView5.setTextColor(getResources().getColor(R.color.hint));
+                                //textView6.setTextColor(getResources().getColor(R.color.hint));
+                                editText1.setTextColor(getResources().getColor(R.color.hint));
+                                editText2.setTextColor(getResources().getColor(R.color.hint));
+                                editText3.setTextColor(getResources().getColor(R.color.hint));
+                                editText4.setTextColor(getResources().getColor(R.color.hint));
+                                //
+                                int bremoveed = gonweiNeededToBeTestList.indexOf(i);
+                                gonweiNeededToBeTestList.remove(bremoveed);
+                                if(gonweiNeededToBeTestList.size() == 0) {
+                                    startTestDataButton.setEnabled(false);
                                 }
-                                String resultTime = resultDataStr4 + " " + resultDataStr1;
-                                m_MyDatabaseAdapter.insertTestDataTableBlueTooth(gVinCode, gPartCode, gongweiName, resultTime,
-                                        resultDataStr2, resultTime, resultTest, "", "", "", Integer.toString(DataHolder.getUserId()));
+                                break;
                             }
-                            else {
-                                //首测不为空，update表中数据，但是要update表中修正数据
-                                xiuzhengTextEdit.setText(resultDataStr2);
-                                xiuzhengTimeTextEdit.setText(resultDataStr1);
-                                xiuzhengCheckbox.setChecked(true);
-                                xiuzhengResult.setText(resultDataStr3);
-                                String resultTest = "";
-                                //if(resultDataStr3.equals("合格")) {
-                                if(testResultFromBtDevice <= controlMaxValue && testResultFromBtDevice >= controlMinValue) {
-                                    resultTest = "0";
-                                    xiuzhengResult.setTextColor(getResources().getColor(R.color.greenbutton));
-                                }
-                                //else if(resultDataStr3.equals("超下限")) {
-                                else if(testResultFromBtDevice < controlMinValue) {
-                                    resultTest = "1";
-                                    xiuzhengResult.setTextColor(getResources().getColor(R.color.theme_default_primary));
-                                }
-                                else if(testResultFromBtDevice >= controlMaxValue) {
-                                    resultTest = "2";
-                                    xiuzhengResult.setTextColor(getResources().getColor(R.color.theme_default_primary));
-                                }
-                                String resultTime = resultDataStr4 + " " + resultDataStr1;
-                                m_MyDatabaseAdapter.updateTestDataTableBlueTooth(gVinCode, gPartCode, gongweiName, resultDataStr2,
-                                        resultTime, resultTest, resultTime);
-                            }
-                            TextView textView0 = (TextView)luosiLayout.findViewById(R.id.gongweimingchengtextview);
-                            TextView textView1 = (TextView)luosiLayout.findViewById(R.id.textview1);
-                            TextView textView2 = (TextView)luosiLayout.findViewById(R.id.textview2);
-                            TextView textView3 = (TextView)luosiLayout.findViewById(R.id.textview3);
-                            TextView textView4 = (TextView)luosiLayout.findViewById(R.id.textview4);
-                            //TextView textView5 = (TextView)luosiLayout.findViewById(R.id.shouceresult);
-                            //TextView textView6 = (TextView)luosiLayout.findViewById(R.id.xiuzhengresult);
-
-
-                            EditText editText1 = (EditText)luosiLayout.findViewById(R.id.shoucetextedit);
-                            EditText editText2 = (EditText)luosiLayout.findViewById(R.id.shoucetimetextedit);
-                            EditText editText3 = (EditText)luosiLayout.findViewById(R.id.xiuzhengtextedit);
-                            EditText editText4 = (EditText)luosiLayout.findViewById(R.id.xiuzhengtimetextedit);
-
-                            textView0.setTextColor(getResources().getColor(R.color.hint));
-                            textView1.setTextColor(getResources().getColor(R.color.hint));
-                            textView2.setTextColor(getResources().getColor(R.color.hint));
-                            textView3.setTextColor(getResources().getColor(R.color.hint));
-                            textView4.setTextColor(getResources().getColor(R.color.hint));
-                            //textView5.setTextColor(getResources().getColor(R.color.hint));
-                            //textView6.setTextColor(getResources().getColor(R.color.hint));
-                            editText1.setTextColor(getResources().getColor(R.color.hint));
-                            editText2.setTextColor(getResources().getColor(R.color.hint));
-                            editText3.setTextColor(getResources().getColor(R.color.hint));
-                            editText4.setTextColor(getResources().getColor(R.color.hint));
-                            //
-                            int bremoveed = gonweiNeededToBeTestList.indexOf(i);
-                            gonweiNeededToBeTestList.remove(bremoveed);
-                            if(gonweiNeededToBeTestList.size() == 0) {
-                                startTestDataButton.setEnabled(false);
-                            }
-                            break;
                         }
                     }
+                    recievedDataIndex++;
+                //}
                 }
-            }
+
 
         }
     }
