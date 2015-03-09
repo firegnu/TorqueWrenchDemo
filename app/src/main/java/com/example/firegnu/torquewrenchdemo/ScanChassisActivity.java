@@ -248,21 +248,68 @@ public class ScanChassisActivity extends Activity {
             }
         });
 
-        ImageButton firstScanButton = (ImageButton) findViewById(R.id.firstscanbutton);
-        firstScanButton.setOnClickListener(new View.OnClickListener() {
+        //
+        //
+        EditText firstscanresulttextview = (EditText)findViewById(R.id.firstscanresulttextview);
+        firstscanresulttextview.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                /*final EditText firstResult = (EditText)findViewById(R.id.firstscanresulttextview);
-                firstResult.setText("");
-                EditText firstResultSuccessful = (EditText)findViewById(R.id.firstresultsuccesful);
-                firstResultSuccessful.setText("");*/
+            public void onClick(View v) {
+                LayoutInflater li = LayoutInflater.from(context);
+                View promptsView = li.inflate(R.layout.modify_scan_result, null);
+
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                        context);
+                alertDialogBuilder.setView(promptsView);
+                final EditText userInput = (EditText) promptsView
+                        .findViewById(R.id.editTextDialogUserInput);
+                alertDialogBuilder
+                        .setCancelable(false)
+                        .setPositiveButton("确定",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog,int id) {
+                                        EditText firstResult = (EditText)findViewById(R.id.firstscanresulttextview);
+
+                                        LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                                        LinearLayout firstStepLiearlayout = (LinearLayout)firstStepLayout.findViewById(R.id.firstchildlayout);
+                                        firstStepLiearlayout.removeAllViews();
+                                        firstResult.setText(userInput.getText().toString());
+                                    }
+                                })
+                        .setNegativeButton("取消",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog,int id) {
+                                        dialog.cancel();
+                                    }
+                                });
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
+            }
+        });
+
+        firstscanresulttextview.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
                 final EditText firstResult = (EditText)findViewById(R.id.firstscanresulttextview);
                 LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 LinearLayout firstStepLiearlayout = (LinearLayout)firstStepLayout.findViewById(R.id.firstchildlayout);
                 firstStepLiearlayout.removeAllViews();
                 //
-                String carMode = m_MyDatabaseAdapter.getInfoFromVinCode("'" + firstResult.getText().toString() + "'");//'E52581'
-                gVinCode = firstResult.getText().toString().toString();
+                String carMode = m_MyDatabaseAdapter.getInfoFromVinCode("'" + s.toString() + "'");//'E52581'
+                gVinCode = s.toString();
                 if(!carMode.equals("")) {
                     gCarMode = carMode;
                     EditText firstResultSuccessful = (EditText)findViewById(R.id.firstresultsuccesful);
@@ -315,18 +362,71 @@ public class ScanChassisActivity extends Activity {
                 thirdStepLiearlayout.removeAllViews();
                 startTestDataButton.setVisibility(View.GONE);
             }
-        });
 
-        ImageButton sencondScanButton = (ImageButton) findViewById(R.id.sencondscanbutton);
-        sencondScanButton.setOnClickListener(new View.OnClickListener() {
+
+        });
+        //
+        //
+
+        ImageButton firstScanButton = (ImageButton) findViewById(R.id.firstscanbutton);
+        firstScanButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*final EditText sencondResult = (EditText)findViewById(R.id.sencondscanresulttextview);
-                sencondResult.setText("");
-                EditText sencondResultSuccessful = (EditText)findViewById(R.id.sencondResultSuccessful);
-                sencondResultSuccessful.setText("");*/
+                //清空输入框
+                final EditText firstResult = (EditText)findViewById(R.id.firstscanresulttextview);
+                firstResult.setText("");
+                EditText firstResultSuccessful = (EditText)findViewById(R.id.firstresultsuccesful);
+                firstResultSuccessful.setText("");
+            }
+
+        });
+        //////sencond
+        /////////////
+        final EditText sencondResult = (EditText)findViewById(R.id.sencondscanresulttextview);
+        sencondResult.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LayoutInflater li = LayoutInflater.from(context);
+                View promptsView = li.inflate(R.layout.modify_scan_result, null);
+
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                        context);
+                alertDialogBuilder.setView(promptsView);
+                final EditText userInput = (EditText) promptsView
+                        .findViewById(R.id.editTextDialogUserInput);
+                alertDialogBuilder
+                        .setCancelable(false)
+                        .setPositiveButton("确定",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog,int id) {
+                                        EditText sencondResult = (EditText)findViewById(R.id.sencondscanresulttextview);
+
+                                        LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                                        LinearLayout sencondStepLiearlayout = (LinearLayout)sencondStepLayout.findViewById(R.id.sencondscanresult);
+                                        sencondStepLiearlayout.removeAllViews();
+                                        sencondResult.setText(userInput.getText().toString());
+                                    }
+                                })
+                        .setNegativeButton("取消",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog,int id) {
+                                        dialog.cancel();
+                                    }
+                                });
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
+            }
+        });
+        sencondResult.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
                 final EditText sencondResult = (EditText)findViewById(R.id.sencondscanresulttextview);
-                gPartCode = sencondResult.getText().toString();
+                gPartCode = s.toString();
                 /////
                 final LinearLayout sencondLayout = (LinearLayout)findViewById(R.id.sencondscanresult);
                 sencondLayout.removeAllViews();
@@ -337,7 +437,7 @@ public class ScanChassisActivity extends Activity {
                 EditText sencondResultSuccessful = (EditText)findViewById(R.id.sencondResultSuccessful);
                 //sencondstep layout add test data
                 //String partCode, String vinCode, String model
-                Cursor cur = m_MyDatabaseAdapter.getPartInfoFromPartNo("'" + sencondResult.getText().toString() + "'",
+                Cursor cur = m_MyDatabaseAdapter.getPartInfoFromPartNo("'" + s.toString() + "'",
                         "'" + gVinCode + "'", "'" + gCarMode + "'");//
                 Boolean bQuery = false;
                 String partName = "";
@@ -661,9 +761,29 @@ public class ScanChassisActivity extends Activity {
                     sencondResultSuccessful.setText("查询失败");
                 }
             }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        /////////////
+        /////////////
+
+        ImageButton sencondScanButton = (ImageButton) findViewById(R.id.sencondscanbutton);
+        sencondScanButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //清空输入框
+                final EditText sencondResult = (EditText)findViewById(R.id.sencondscanresulttextview);
+                sencondResult.setText("");
+                EditText sencondResultSuccessful = (EditText)findViewById(R.id.sencondResultSuccessful);
+                sencondResultSuccessful.setText("");
+
+            }
         });
 
-        final EditText firstResult = (EditText)findViewById(R.id.firstscanresulttextview);
+        /*final EditText firstResult = (EditText)findViewById(R.id.firstscanresulttextview);
         //scan finished
         firstResult.addTextChangedListener(new TextWatcher() {
             @Override
@@ -705,7 +825,7 @@ public class ScanChassisActivity extends Activity {
                 EditText sencondResultSuccessful = (EditText)findViewById(R.id.sencondResultSuccessful);
                 sencondResultSuccessful.setText("");
             }
-        });
+        });*/
 
         startTestDataButton = (Button)findViewById(R.id.starttestdatabutton);
         startTestDataButton.setOnClickListener(new View.OnClickListener() {
@@ -840,7 +960,7 @@ public class ScanChassisActivity extends Activity {
             if (mBluetoothLeService != null) {
                 mBluetoothLeService.update_rssi();
                 //updateConnectionState(R.string.connected, mBluetoothLeService.get_rssi() + "");
-                setTitle("信号强度:" + mBluetoothLeService.get_rssi() + "db");
+                setTitle("信号强度:" + mBluetoothLeService.get_rssi());
             }
             mHandler.postDelayed(this, 200);
         }
@@ -1295,7 +1415,7 @@ public class ScanChassisActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterReceiver(mGattUpdateReceiver);
+        ///unregisterReceiver(mGattUpdateReceiver);
     }
 
     @Override

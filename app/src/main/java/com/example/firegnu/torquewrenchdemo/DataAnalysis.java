@@ -20,7 +20,7 @@ public class DataAnalysis {
             System.out.print(key + ":" + map.get(key) + "\n");
         }
     }*/
-    public static HashMap<String, String> toData(String data) {
+    public static HashMap<String, String> toData(String data){
         map.clear();
         String array[] = data.split(" ");
         //预置值编号
@@ -40,7 +40,7 @@ public class DataAnalysis {
         int precision = Integer.valueOf(array[5],16);
         String precisionRange = "+/-" + precision + "%";
         map.put("精度范围", precisionRange);
-        //日期
+        //日期时间
         int yearNum = Integer.valueOf(array[6],16);
         String year = null;
         if(yearNum < 10){
@@ -65,9 +65,6 @@ public class DataAnalysis {
         else{
             day = dayNum + "";
         }
-        String date = year + "-" + month + "-" + day;
-        map.put("日期", date);
-        //时间
         int hour = Integer.valueOf(array[9],16);
         String Hour = hour + "";
         if(hour < 10){
@@ -78,59 +75,95 @@ public class DataAnalysis {
         if(minute < 10){
             Minute = "0" + minute;
         }
-        String time = Hour + ":" + Minute;
+        String date = year + "-" + month + "-" + day;
+        String time = Hour + ":" + Minute + ":00";
+        map.put("日期", date);
         map.put("时间", time);
         //预置值实测值差值
         float preValue = Integer.valueOf(array[1] + array[2],16);
-        float peakValue = Integer.valueOf(array[11] + array[12],16);
-        int pointPos = Integer.parseInt(array[3]);
+        String _peakValue16 = Integer.valueOf(array[11] + array[12],16).toString();
+        Integer _peakValue10 = Integer.valueOf(_peakValue16,10);
+        String _peakValue2 = Integer.toBinaryString(_peakValue10);
+        if(_peakValue2.length() < 16) {
+            String bu = "";
+            for(int i = 0;i<16-_peakValue2.length();i++){
+                bu = "0" + bu;
+            }
+            _peakValue2 = bu + _peakValue2;
+        }
+        //System.out.print(_peakValue2 + "\n");
+        //System.out.print(_peakValue2.substring(0, 1) + "\n");
+        float peakValue = 0;
+        if(_peakValue2.substring(0, 1).equalsIgnoreCase("0")){
+            peakValue = Integer.valueOf(array[11] + array[12],16);
+        }
+        else if(_peakValue2.substring(0, 1).equalsIgnoreCase("1")){
+            String result_new = "";
+            for(int i=0;i < _peakValue2.length();i++){
+                String temp = "";
+                if(_peakValue2.substring(i, i+1).equalsIgnoreCase("0")){
+                    temp = "1";
+                }
+                else if(_peakValue2.substring(i, i+1).equalsIgnoreCase("1")){
+                    temp = "0";
+                }
+                result_new = result_new + temp;
+            }
+            //System.out.print(result_new + "\n");
+            Integer a = Integer.parseInt(Integer.valueOf(result_new,2).toString()) + 1;
+            //System.out.print(a + "\n");
+            String b = Integer.toHexString(a);
+            peakValue = Integer.valueOf(b,16);
+            //System.out.print(peakValue + "\n");
+        }
+        //int pointPos = Integer.parseInt(array[3]);
         float preValue_f = 0;
         float peakValue_f = 0;
         float d_value = 0;
         String preValue_s = null;
         String peakValue_s = null;
         String d_value_s = null;
-        if(pointPos == 1){
-            preValue_f = preValue/10000;
-            peakValue_f = peakValue/10000;
-            DecimalFormat decimalFormat = new DecimalFormat(".0000");
-            preValue_s = decimalFormat.format(preValue_f);
-            peakValue_s = decimalFormat.format(peakValue_f);
-            d_value = peakValue_f - preValue_f;
-            d_value_s = decimalFormat.format(d_value);
-        }
-        else if(pointPos == 2){
-            preValue_f = preValue/1000;
-            peakValue_f = peakValue/1000;
-            DecimalFormat decimalFormat = new DecimalFormat(".000");
-            preValue_s = decimalFormat.format(preValue_f);
-            peakValue_s = decimalFormat.format(peakValue_f);
-            d_value = peakValue_f - preValue_f;
-            d_value_s = decimalFormat.format(d_value);
-        }
-        else if(pointPos == 3){
-            preValue_f = preValue/100;
-            peakValue_f = peakValue/100;
-            DecimalFormat decimalFormat = new DecimalFormat(".00");
-            preValue_s = decimalFormat.format(preValue_f);
-            peakValue_s = decimalFormat.format(peakValue_f);
-            d_value = peakValue_f - preValue_f;
-            d_value_s = decimalFormat.format(d_value);
-        }
-        else if(pointPos == 4){
-            preValue_f = preValue/10;
-            peakValue_f = peakValue/10;
-            DecimalFormat decimalFormat = new DecimalFormat(".0");
-            preValue_s = decimalFormat.format(preValue_f);
-            peakValue_s = decimalFormat.format(peakValue_f);
-            d_value = peakValue_f - preValue_f;
-            d_value_s = decimalFormat.format(d_value);
-        }
-        else if(pointPos == 5){
-            preValue_s = String.valueOf((int)preValue);
-            peakValue_s = String.valueOf((int)peakValue);
-            d_value_s = String.valueOf((int)peakValue - (int)preValue);
-        }
+//		if(pointPos == 1){
+//			preValue_f = preValue/10000;
+//			peakValue_f = peakValue/10000;
+//			DecimalFormat decimalFormat = new DecimalFormat(".0000");
+//			preValue_s = decimalFormat.format(preValue_f);
+//			peakValue_s = decimalFormat.format(peakValue_f);
+//			d_value = peakValue_f - preValue_f;
+//			d_value_s = decimalFormat.format(d_value);
+//		}
+//		else if(pointPos == 2){
+//			preValue_f = preValue/1000;
+//			peakValue_f = peakValue/1000;
+//			DecimalFormat decimalFormat = new DecimalFormat(".000");
+//			preValue_s = decimalFormat.format(preValue_f);
+//			peakValue_s = decimalFormat.format(peakValue_f);
+//			d_value = peakValue_f - preValue_f;
+//			d_value_s = decimalFormat.format(d_value);
+//		}
+//		else if(pointPos == 3){
+//			preValue_f = preValue/100;
+//			peakValue_f = peakValue/100;
+//			DecimalFormat decimalFormat = new DecimalFormat(".00");
+//			preValue_s = decimalFormat.format(preValue_f);
+//			peakValue_s = decimalFormat.format(peakValue_f);
+//			d_value = peakValue_f - preValue_f;
+//			d_value_s = decimalFormat.format(d_value);
+//		}
+//		else if(pointPos == 4){
+//			preValue_f = preValue/10;
+//			peakValue_f = peakValue/10;
+//			DecimalFormat decimalFormat = new DecimalFormat(".0");
+//			preValue_s = decimalFormat.format(preValue_f);
+//			peakValue_s = decimalFormat.format(peakValue_f);
+//			d_value = peakValue_f - preValue_f;
+//			d_value_s = decimalFormat.format(d_value);
+//		}
+//		else if(pointPos == 5){
+        preValue_s = String.valueOf((int)preValue);
+        peakValue_s = String.valueOf((int)peakValue);
+        d_value_s = String.valueOf((int)peakValue - (int)preValue);
+//		}
         map.put("预置值", preValue_s);
         map.put("实测值", peakValue_s);
         map.put("差值", d_value_s);
@@ -155,7 +188,6 @@ public class DataAnalysis {
             result = "合格";
         }
         map.put("结论", result);
-
 
         return map;
     }
