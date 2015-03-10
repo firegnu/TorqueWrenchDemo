@@ -722,6 +722,30 @@ public class ScanChassisActivity extends Activity {
                                                     gonweiNeededToBeTestList.add(i);
                                                     startTestDataButton.setEnabled(true);
                                                 }
+                                                //如果已经点击，则取消
+                                                else {
+                                                    gonweiNeededToBeTestList.remove(gonweiNeededToBeTestList.indexOf(i));
+                                                    textView0.setTextColor(getResources().getColor(R.color.hint));
+                                                    textView1.setTextColor(getResources().getColor(R.color.hint));
+                                                    textView2.setTextColor(getResources().getColor(R.color.hint));
+                                                    textView3.setTextColor(getResources().getColor(R.color.hint));
+                                                    textView4.setTextColor(getResources().getColor(R.color.hint));
+                                                    /////textView5.setTextColor(getResources().getColor(R.color.pureblack));
+                                                    /////textView6.setTextColor(getResources().getColor(R.color.pureblack));
+                                                    if(textView5.getText().toString().equals("未检测")) {
+                                                        textView5.setTextColor(getResources().getColor(R.color.hint));
+                                                    }
+                                                    if(textView6.getText().toString().equals("未修正")) {
+                                                        textView6.setTextColor(getResources().getColor(R.color.hint));
+                                                    }
+                                                    editText1.setTextColor(getResources().getColor(R.color.hint));
+                                                    editText2.setTextColor(getResources().getColor(R.color.hint));
+                                                    editText3.setTextColor(getResources().getColor(R.color.hint));
+                                                    editText4.setTextColor(getResources().getColor(R.color.hint));
+                                                    if(gonweiNeededToBeTestList.size() == 0) {
+                                                        startTestDataButton.setEnabled(false);
+                                                    }
+                                                }
                                             }
                                         }
                                     }
@@ -1207,8 +1231,6 @@ public class ScanChassisActivity extends Activity {
             }
             //解析接收接收扭矩扳手发送过来的数据
             else {
-
-
                 //else {
                     if(recievedDataIndex == (testDataCount - 1) ) {
                         //发送清空指令
