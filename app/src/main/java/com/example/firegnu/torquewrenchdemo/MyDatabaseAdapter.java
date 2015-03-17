@@ -20,7 +20,6 @@ import java.io.IOException;
  *
  */
 public class MyDatabaseAdapter {
-
     // 数据库名称
     private static final String DB_NAME = "torquewrench.sqlite";
     public static final String T_GROUP = "_group";
