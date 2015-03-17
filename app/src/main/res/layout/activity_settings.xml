@@ -76,6 +76,46 @@
         </FrameLayout>
 
     </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="5dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="设置扳手精度"
+                android:layout_gravity="center"/>
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="10"
+                >
+                <EditText
+                    android:id="@+id/savebanshoujingdu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="0.1"
+                    />
+
+                <ImageButton
+                    android:id="@+id/savebanshoujingdubutton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_action_send_now"
+                    android:background="@android:color/transparent"
+                    android:layout_gravity="right|center_vertical"
+                    />
+            </FrameLayout>
+
+        </LinearLayout>
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="0.5dp"
+            android:background="@android:color/darker_gray"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -143,6 +183,17 @@
             android:id="@+id/autorefreshdataswitch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
+        <Button
+            android:id="@+id/immediateasyndatafromserver"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="立即同步数据"
+            android:layout_marginTop="5dp"
+            android:textColor="#fff"
+            android:background="@drawable/settings_button_style"
+            android:padding="10dp"
+            android:layout_marginLeft="15dp"
+            style="?android:attr/buttonStyleSmall" />
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -192,17 +243,9 @@
             android:layout_height="wrap_content"
             android:clickable="false"
             android:checked="true"/>
+
     </LinearLayout>
-    <Button
-        android:id="@+id/immediateasyndatafromserver"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="立即同步数据"
-        android:layout_marginTop="5dp"
-        android:textColor="#fff"
-        android:background="@drawable/settings_button_style"
-        android:padding="10dp"
-        style="?android:attr/buttonStyleSmall" />
+
     <TextView
         android:id="@+id/lastsynctimetextview"
         android:layout_width="wrap_content"
@@ -212,6 +255,12 @@
         android:layout_marginBottom="10dp"
         android:layout_gravity="center"
         />
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="0.5dp"
+            android:background="@android:color/darker_gray"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

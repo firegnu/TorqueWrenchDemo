@@ -12,6 +12,7 @@ import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -80,9 +81,9 @@ public class Settings extends Activity {
 
         final ActionBar actionBar = getActionBar();
         setHasEmbeddedTabs(actionBar,false);
-        setTitle(DataHolder.getUserName());
-        actionBar.setDisplayShowHomeEnabled(false);
-        //getActionBar().setIcon(R.drawable.userlogo);
+        setTitle("当前用户: " + DataHolder.getUserName());
+        actionBar.setDisplayShowHomeEnabled(true);
+        getActionBar().setIcon(R.drawable.background1);
 
         Button logoutButton = (Button) findViewById(R.id.logoutbutton);
         logoutButton.setOnClickListener(new View.OnClickListener() {
@@ -770,6 +771,9 @@ public class Settings extends Activity {
                 Intent historyActivity= new Intent(this, ScanHistory.class);
                 historyActivity.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(historyActivity);
+                return true;
+            case android.R.id.home:
+                NavUtils.navigateUpFromSameTask(this);
                 return true;
             case R.id.action_setting_menu:
                 return true;

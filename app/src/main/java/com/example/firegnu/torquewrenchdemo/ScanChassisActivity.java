@@ -361,6 +361,9 @@ public class ScanChassisActivity extends Activity {
                 LinearLayout thirdStepLiearlayout = (LinearLayout)thirdStepLayout.findViewById(R.id.thirdchildlayout);
                 thirdStepLiearlayout.removeAllViews();
                 startTestDataButton.setVisibility(View.GONE);
+                //点击第二个扫描按钮
+                sencondStepButton.performClick();
+                /////////////////
             }
 
 
@@ -755,6 +758,8 @@ public class ScanChassisActivity extends Activity {
                                 startTestDataButton.setEnabled(false);
                             }
                             //////////////////////////////////////////
+                            thirdStepButton.performClick();
+                            startTestDataButton.performClick();
                             //////////////////////////////////////////
                             arg0.setVisibility(View.VISIBLE);
                         }
