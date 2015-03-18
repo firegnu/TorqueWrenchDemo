@@ -11,9 +11,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
@@ -30,6 +34,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -50,6 +55,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
@@ -210,6 +217,7 @@ public class LoginActivity extends Activity {
             userNameTextView.setText(nameList.get(userIndex).toString());
             if(photoList.get(userIndex) != null) {
                 Picasso.with(this).load("http://" + DataHolder.getServerAddress() + photoList.get(userIndex).toString()).into(publisherPhotoView);
+                DataHolder.setUserAvatar(photoList.get(userIndex).toString());
             }
         }
         //

@@ -290,20 +290,21 @@ public class ScanChassisActivity extends Activity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                // TODO Auto-generated method stub
 
             }
 
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                // TODO Auto-generated method stub
 
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
                 final EditText firstResult = (EditText)findViewById(R.id.firstscanresulttextview);
+                firstResult.removeTextChangedListener(this);
+                firstResult.setText("");
+                firstResult.setText(s.toString());
+                firstResult.addTextChangedListener(this);
                 LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 LinearLayout firstStepLiearlayout = (LinearLayout)firstStepLayout.findViewById(R.id.firstchildlayout);
                 firstStepLiearlayout.removeAllViews();
@@ -345,10 +346,16 @@ public class ScanChassisActivity extends Activity {
                         TextView lingjianName = (TextView)lingjianCodeLayout.findViewById(R.id.lingjianpartnotextview);
                         lingjianName.setText(partNoList.get(i).toString());
                     }
+                    //点击第二个扫描按钮
+                    sencondStepButton.performClick();
+                    /////////////////
                 }
                 else {
                     EditText firstResultSuccessful = (EditText)findViewById(R.id.firstresultsuccesful);
                     firstResultSuccessful.setText("查询失败");
+                    Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                    Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
+                    r.play();
                 }
                 //把第二个和第三个清空
                 final LinearLayout sencondLayout = (LinearLayout)findViewById(R.id.sencondscanresult);
@@ -361,9 +368,7 @@ public class ScanChassisActivity extends Activity {
                 LinearLayout thirdStepLiearlayout = (LinearLayout)thirdStepLayout.findViewById(R.id.thirdchildlayout);
                 thirdStepLiearlayout.removeAllViews();
                 startTestDataButton.setVisibility(View.GONE);
-                //点击第二个扫描按钮
-                sencondStepButton.performClick();
-                /////////////////
+
             }
 
 
@@ -429,6 +434,10 @@ public class ScanChassisActivity extends Activity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 final EditText sencondResult = (EditText)findViewById(R.id.sencondscanresulttextview);
+                sencondResult.removeTextChangedListener(this);
+                sencondResult.setText("");
+                sencondResult.setText(s.toString());
+                sencondResult.addTextChangedListener(this);
                 gPartCode = s.toString();
                 /////
                 final LinearLayout sencondLayout = (LinearLayout)findViewById(R.id.sencondscanresult);
@@ -788,6 +797,9 @@ public class ScanChassisActivity extends Activity {
                 }
                 else {
                     sencondResultSuccessful.setText("查询失败");
+                    Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                    Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
+                    r.play();
                 }
             }
 
@@ -861,9 +873,24 @@ public class ScanChassisActivity extends Activity {
             @Override
             public void onClick(View v) {
                 //与蓝牙设备同步参数
+                //todo: 需要熊伟改函数，针对小数点
+                SharedPreferences settingsBanshouJingdu = getApplicationContext().getSharedPreferences("banshouJingdu", 0);
+                int definedBanshouJingdu = 0;
+                int banshouJingduSelected = settingsBanshouJingdu.getInt("banshouJingdu", definedBanshouJingdu);
+                if(banshouJingduSelected == 0) {
+
+                }
+                else if(banshouJingduSelected == 1) {
+
+                }
+                else if(banshouJingduSelected == 2) {
+
+                }
+                else if(banshouJingduSelected == 3) {
+
+                }
                 String btDevicePara = DataAnalysis.sendTechnicsData(gonweiNeededToBeTestList.size(), controlMaxValue, controlMinValue);
                 if(gonweiNeededToBeTestList.size() > 0) {
-                    //todo: hard code
                     //收到数据初始化
                     testDataCount = gonweiNeededToBeTestList.size();
                     recievedDataIndex = 0;
@@ -1157,7 +1184,6 @@ public class ScanChassisActivity extends Activity {
                     @Override
                     public void run() {
                         String adjustTimerToBtDevice = DataAnalysis.adjustTime();
-                        //todo: hard code
                         sendData(adjustTimerToBtDevice);//55 AA DD 0F 03 07 16 02 0E 5A 5A
                     }
                 }, 1000);

@@ -3,7 +3,7 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
         <item name="android:windowActionBarOverlay">false</item>
-        <item name="android:homeAsUpIndicator">@drawable/back</item>
+        <item name="android:homeAsUpIndicator">@drawable/ic_action_back</item>
     </style>
     <style name="tableHeaderRow">
         <item name="android:background">#7FAF7F</item>

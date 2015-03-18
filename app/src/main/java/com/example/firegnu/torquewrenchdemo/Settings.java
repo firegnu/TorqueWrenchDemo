@@ -9,11 +9,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.NavUtils;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -25,10 +30,14 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -49,6 +58,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
@@ -69,7 +80,9 @@ public class Settings extends Activity {
     private View mProgressView;
     private List<Integer> idList = new ArrayList<Integer>();
     private List<String> nameList = new ArrayList<String>();
+    private List<String> banshouJingduList = new ArrayList<>();
     private String newPassword = "";
+    private ImageView avatarImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,9 +94,18 @@ public class Settings extends Activity {
 
         final ActionBar actionBar = getActionBar();
         setHasEmbeddedTabs(actionBar,false);
-        setTitle("当前用户: " + DataHolder.getUserName());
-        actionBar.setDisplayShowHomeEnabled(true);
-        getActionBar().setIcon(R.drawable.background1);
+        //////////setTitle(DataHolder.getUserName());
+        actionBar.setDisplayShowHomeEnabled(false);
+        actionBar.setDisplayShowTitleEnabled(false);
+        LayoutInflater mInflater = LayoutInflater.from(this);
+        View mCustomView = mInflater.inflate(R.layout.custome_actionbar, null);
+        TextView mTitleTextView = (TextView) mCustomView.findViewById(R.id.title_text);
+        avatarImage = (ImageView)mCustomView.findViewById(R.id.imageView1);
+        mTitleTextView.setText(DataHolder.getUserName());
+        actionBar.setCustomView(mCustomView);
+        actionBar.setDisplayShowCustomEnabled(true);
+
+        Picasso.with(this).load(DataHolder.getServerAddress() + DataHolder.getUserAvatar()).into(avatarImage);
 
         Button logoutButton = (Button) findViewById(R.id.logoutbutton);
         logoutButton.setOnClickListener(new View.OnClickListener() {
@@ -179,7 +201,6 @@ public class Settings extends Activity {
                 arg0.setVisibility(View.VISIBLE);
             }
             public void onNothingSelected(AdapterView<?> arg0) {
-                // TODO Auto-generated method stub
                 //selectedPerson = "";
                 arg0.setVisibility(View.VISIBLE);
             }
@@ -187,14 +208,51 @@ public class Settings extends Activity {
 
         groupSpinner.setOnTouchListener(new Spinner.OnTouchListener(){
             public boolean onTouch(View v, MotionEvent event) {
-                // TODO Auto-generated method stub
                 return false;
             }
         });
 
         groupSpinner.setOnFocusChangeListener(new Spinner.OnFocusChangeListener(){
             public void onFocusChange(View v, boolean hasFocus) {
-                // TODO Auto-generated method stub
+
+            }
+        });
+        ////////////////////
+        //扳手精度
+        banshouJingduList.add("0");
+        banshouJingduList.add("0.1");
+        banshouJingduList.add("0.01");
+        banshouJingduList.add("0.001");
+        SharedPreferences settingsBanshouJingdu = getApplicationContext().getSharedPreferences("banshouJingdu", 0);
+        int definedBanshouJingdu = 0;
+        final int banshouJingduSelected = settingsBanshouJingdu.getInt("banshouJingdu", definedBanshouJingdu);
+        Spinner banshouiJingduSpinner = (Spinner)findViewById(R.id.banshoujingdu);
+        final ArrayAdapter<String> adapterBanshouJingdu = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, banshouJingduList);
+        adapterBanshouJingdu.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        banshouiJingduSpinner.setAdapter(adapterBanshouJingdu);
+        banshouiJingduSpinner.setSelection(banshouJingduSelected);
+        banshouiJingduSpinner.setOnItemSelectedListener(new Spinner.OnItemSelectedListener(){
+            public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+                SharedPreferences banshouJingdu = getApplicationContext().getSharedPreferences("banshouJingdu", 0);
+                SharedPreferences.Editor editorBanshouJingdu = banshouJingdu.edit();
+                editorBanshouJingdu.putInt("banshouJingdu", arg2);
+                editorBanshouJingdu.apply();
+                arg0.setVisibility(View.VISIBLE);
+            }
+            public void onNothingSelected(AdapterView<?> arg0) {
+                //selectedPerson = "";
+                arg0.setVisibility(View.VISIBLE);
+            }
+        });
+
+        banshouiJingduSpinner.setOnTouchListener(new Spinner.OnTouchListener(){
+            public boolean onTouch(View v, MotionEvent event) {
+                return false;
+            }
+        });
+
+        banshouiJingduSpinner.setOnFocusChangeListener(new Spinner.OnFocusChangeListener(){
+            public void onFocusChange(View v, boolean hasFocus) {
 
             }
         });
@@ -288,6 +346,43 @@ public class Settings extends Activity {
             lastSyncTimeTextView.setText("你还未做过同步!");
         }
     }
+
+    private Target target = new Target() {
+        @Override
+        public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom loadedFrom) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    File file = new File(Environment.getExternalStorageDirectory().getPath() + "/avatar.jpg");
+                    try {
+                        file.createNewFile();
+                        FileOutputStream ostream = new FileOutputStream(file);
+                        bitmap.compress(Bitmap.CompressFormat.JPEG,100,ostream);
+                        ostream.close();
+
+                        Drawable d = new BitmapDrawable(getResources(),bitmap);
+                        //getActionBar().setIcon(d);
+                        avatarImage.setBackground(d);
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }).start();
+        }
+
+        @Override
+        public void onBitmapFailed(Drawable drawable) {
+            //getActionBar().setIcon(R.drawable.userlogo);
+            //avatarImage.setBackground(R.drawable.userlogo);
+        }
+
+        @Override
+        public void onPrepareLoad(Drawable drawable) {
+
+        }
+    };
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     public void showProgress(final boolean show) {
@@ -407,10 +502,8 @@ public class Settings extends Activity {
                     bUpdate = true;
                 }
             } catch (ClientProtocolException e) {
-                // TODO Auto-generated catch block
                 bUpdate = false;
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 bUpdate = false;
             }
         }
@@ -678,9 +771,7 @@ public class Settings extends Activity {
                   System.out.println(line);
 
             } catch (ClientProtocolException e) {
-                // TODO Auto-generated catch block
             } catch (IOException e) {
-                // TODO Auto-generated catch block
             }
         }
 
@@ -750,7 +841,7 @@ public class Settings extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_scan_chassis, menu);
+        inflater.inflate(R.menu.menu_settings, menu);
         return super.onCreateOptionsMenu(menu);
     }
 

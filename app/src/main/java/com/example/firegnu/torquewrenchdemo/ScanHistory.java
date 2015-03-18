@@ -244,7 +244,6 @@ public class ScanHistory extends Activity {
             table_row.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // TODO: do your logic here
                     //Log.d("ListViewTableActivity", " on click ");
                 }
             });
@@ -330,7 +329,6 @@ public class ScanHistory extends Activity {
                 filterButton.performClick();
             }
             public void onNothingSelected(AdapterView<?> arg0) {
-                // TODO Auto-generated method stub
                 selectedPerson = "";
                 arg0.setVisibility(View.VISIBLE);
             }
@@ -338,14 +336,12 @@ public class ScanHistory extends Activity {
 
         spinnerPerson.setOnTouchListener(new Spinner.OnTouchListener(){
             public boolean onTouch(View v, MotionEvent event) {
-                // TODO Auto-generated method stub
                 return false;
             }
         });
 
         spinnerPerson.setOnFocusChangeListener(new Spinner.OnFocusChangeListener(){
             public void onFocusChange(View v, boolean hasFocus) {
-                // TODO Auto-generated method stub
 
             }
         });
@@ -370,7 +366,6 @@ public class ScanHistory extends Activity {
                 //filterButton.performClick();
             }
             public void onNothingSelected(AdapterView<?> arg0) {
-                // TODO Auto-generated method stub
                 selectedPara = "";
                 arg0.setVisibility(View.VISIBLE);
             }
@@ -378,14 +373,12 @@ public class ScanHistory extends Activity {
 
         spinnerPara.setOnTouchListener(new Spinner.OnTouchListener(){
             public boolean onTouch(View v, MotionEvent event) {
-                // TODO Auto-generated method stub
                 return false;
             }
         });
 
         spinnerPara.setOnFocusChangeListener(new Spinner.OnFocusChangeListener(){
             public void onFocusChange(View v, boolean hasFocus) {
-                // TODO Auto-generated method stub
 
             }
         });
@@ -410,7 +403,6 @@ public class ScanHistory extends Activity {
                 //filterButton.performClick();
             }
             public void onNothingSelected(AdapterView<?> arg0) {
-                // TODO Auto-generated method stub
                 selectedPara = "";
                 arg0.setVisibility(View.VISIBLE);
             }
@@ -418,14 +410,12 @@ public class ScanHistory extends Activity {
 
         spinnerName.setOnTouchListener(new Spinner.OnTouchListener(){
             public boolean onTouch(View v, MotionEvent event) {
-                // TODO Auto-generated method stub
                 return false;
             }
         });
 
         spinnerName.setOnFocusChangeListener(new Spinner.OnFocusChangeListener(){
             public void onFocusChange(View v, boolean hasFocus) {
-                // TODO Auto-generated method stub
 
             }
         });
@@ -587,7 +577,6 @@ public class ScanHistory extends Activity {
                     table_row.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            // TODO: do your logic here
                             //Log.d("ListViewTableActivity", " on click ");
                         }
                     });
@@ -632,7 +621,6 @@ public class ScanHistory extends Activity {
             table_row.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // TODO: do your logic here
                     //Log.d("ListViewTableActivity", " on click ");
                 }
             });
