@@ -61,7 +61,7 @@ public class MyDatabaseAdapter {
             e.printStackTrace();
         }
     }
-    // 打开数据库
+    //打开数据库
     public void open() throws SQLException {
         DataBaseHelper myDbHelper = new DataBaseHelper(mContext, DB_NAME);
         try {
